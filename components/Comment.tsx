@@ -5,7 +5,7 @@ import icons from "@/constants/icons";
 import { Models } from "react-native-appwrite";
 
 interface Props {
-  item: Models.Document;
+  item: Models.DefaultDocument;
 }
 
 const Comment = ({ item }: Props) => {

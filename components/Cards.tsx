@@ -4,7 +4,7 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Models } from "react-native-appwrite";
 
 interface Props {
-  item: Models.Document;
+  item: Models.DefaultDocument;
   onPress?: () => void;
 }
 
