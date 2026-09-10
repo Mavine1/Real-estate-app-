@@ -8,7 +8,7 @@ interface GlobalContextType {
   isLogged: boolean;
   user: User | null;
   loading: boolean;
-  refetch: () => void;
+  refetch: () => Promise<void>;
 }
 
 interface User {
