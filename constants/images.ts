@@ -1,4 +1,5 @@
 import onboarding from "@/assets/images/onboarding.png";
+import onboardingBaraka from "@/assets/images/onboarding-baraka.png";
 import avatar from "@/assets/images/avatar.png";
 import newYork from "@/assets/images/new-york.png";
 import japan from "@/assets/images/japan.png";
@@ -10,6 +11,7 @@ import noResult from "@/assets/images/no-result.png";
 
 export default {
   onboarding,
+  onboardingBaraka,
   avatar,
   newYork,
   japan,

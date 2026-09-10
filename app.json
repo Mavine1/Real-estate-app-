@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "restate",
-    "slug": "restate",
+    "name": "Baraka Homes",
+    "slug": "baraka-homes",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/favicon.png",
-    "scheme": "myapp",
+    "scheme": "barakahomes",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true
