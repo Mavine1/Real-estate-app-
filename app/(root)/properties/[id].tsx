@@ -88,7 +88,7 @@ const Property = () => {
             <View className="flex flex-row items-center gap-2">
               <Image source={icons.star} className="size-5" />
               <Text className="text-black-200 text-sm mt-1 font-rubik-medium">
-                {property?.rating} ({property?.reviews?.length ?? 0} reviews)
+                {property?.rating} ({property?.reviews.length} reviews)
               </Text>
             </View>
           </View>
@@ -122,16 +122,16 @@ const Property = () => {
             <View className="flex flex-row items-center justify-between mt-4">
               <View className="flex flex-row items-center">
                 <Image
-                  source={{ uri: property?.agent?.avatar }}
+                  source={{ uri: property?.agent.avatar }}
                   className="size-14 rounded-full"
                 />
 
                 <View className="flex flex-col items-start justify-center ml-3">
                   <Text className="text-lg text-black-300 text-start font-rubik-bold">
-                    {property?.agent?.name}
+                    {property?.agent.name}
                   </Text>
                   <Text className="text-sm text-black-200 text-start font-rubik-medium">
-                    {property?.agent?.email}
+                    {property?.agent.email}
                   </Text>
                 </View>
               </View>
@@ -157,7 +157,7 @@ const Property = () => {
               Facilities
             </Text>
 
-            {(property?.facilities?.length ?? 0) > 0 && (
+            {property?.facilities.length > 0 && (
               <View className="flex flex-row flex-wrap items-start justify-start mt-2 gap-5">
                 {property?.facilities.map((item: string, index: number) => {
                   const facility = facilities.find(
@@ -190,14 +190,14 @@ const Property = () => {
             )}
           </View>
 
-          {(property?.gallery?.length ?? 0) > 0 && (
+          {property?.gallery.length > 0 && (
             <View className="mt-7">
               <Text className="text-black-300 text-xl font-rubik-bold">
                 Gallery
               </Text>
               <FlatList
                 contentContainerStyle={{ paddingRight: 20 }}
-                data={property?.gallery ?? []}
+                data={property?.gallery}
                 keyExtractor={(item) => item.$id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -229,13 +229,13 @@ const Property = () => {
             />
           </View>
 
-          {(property?.reviews?.length ?? 0) > 0 && (
+          {property?.reviews.length > 0 && (
             <View className="mt-7">
               <View className="flex flex-row items-center justify-between">
                 <View className="flex flex-row items-center">
                   <Image source={icons.star} className="size-6" />
                   <Text className="text-black-300 text-xl font-rubik-bold ml-2">
-                    {property?.rating} ({property?.reviews?.length ?? 0} reviews)
+                    {property?.rating} ({property?.reviews.length} reviews)
                   </Text>
                 </View>
 
@@ -247,9 +247,7 @@ const Property = () => {
               </View>
 
               <View className="mt-5">
-                {property?.reviews?.[0] && (
-                  <Comment item={property.reviews[0]} />
-                )}
+                <Comment item={property?.reviews[0]} />
               </View>
             </View>
           )}
