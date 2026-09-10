@@ -1,10 +1,10 @@
 import icons from "@/constants/icons";
 import images from "@/constants/images";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import { Property } from "@/lib/postgres";
+import { Models } from "react-native-appwrite";
 
 interface Props {
-  item: Property;
+  item: Models.DefaultDocument;
   onPress?: () => void;
 }
 

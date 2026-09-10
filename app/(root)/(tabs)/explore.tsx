@@ -16,7 +16,7 @@ import { Card } from "@/components/Cards";
 import Filters from "@/components/Filters";
 import NoResults from "@/components/NoResults";
 
-import { getProperties } from "@/lib/postgres";
+import { getProperties } from "@/lib/appwrite";
 import { useAppwrite } from "@/lib/useAppwrite";
 
 const Explore = () => {

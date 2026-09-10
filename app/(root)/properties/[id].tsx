@@ -16,7 +16,7 @@ import Comment from "@/components/Comment";
 import { facilities } from "@/constants/data";
 
 import { useAppwrite } from "@/lib/useAppwrite";
-import { getPropertyById } from "@/lib/postgres";
+import { getPropertyById } from "@/lib/appwrite";
 
 const Property = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
