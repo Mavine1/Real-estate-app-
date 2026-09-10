@@ -25,23 +25,24 @@ const Filters = () => {
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      className="mt-3 mb-2"
+      className="mt-4"
+      contentContainerStyle={{ paddingRight: 8 }}
     >
       {categories.map((item, index) => (
         <TouchableOpacity
           onPress={() => handleCategoryPress(item.category)}
           key={index}
-          className={`flex flex-col items-start mr-4 px-4 py-2 rounded-full ${
+          className={`mr-2 rounded-full border px-4 py-2.5 ${
             selectedCategory === item.category
-              ? "bg-primary-300"
-              : "bg-primary-100 border border-primary-200"
+              ? "border-primary-300 bg-primary-300"
+              : "border-primary-200 bg-white"
           }`}
         >
           <Text
             className={`text-sm ${
               selectedCategory === item.category
-                ? "text-white font-rubik-bold mt-0.5"
-                : "text-black-300 font-rubik"
+                ? "text-white font-rubik-bold"
+                : "text-black-300 font-rubik-medium"
             }`}
           >
             {item.title}

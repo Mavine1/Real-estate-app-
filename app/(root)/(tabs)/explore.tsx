@@ -45,16 +45,14 @@ const Explore = () => {
   const handleCardPress = (id: string) => router.push(`/properties/${id}`);
 
   return (
-    <SafeAreaView className="h-full bg-white">
+    <SafeAreaView className="h-full bg-accent-100">
       <FlatList
         data={properties}
-        numColumns={2}
         renderItem={({ item }) => (
           <Card item={item} onPress={() => handleCardPress(item.$id)} />
         )}
         keyExtractor={(item) => item.$id}
         contentContainerClassName="pb-32"
-        columnWrapperClassName="flex gap-5 px-5"
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           loading ? (

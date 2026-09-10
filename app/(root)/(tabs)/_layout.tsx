@@ -12,22 +12,22 @@ const TabIcon = ({
   icon: ImageSourcePropType;
   title: string;
 }) => (
-  <View className="flex-1 mt-3 flex flex-col items-center">
+  <View
+    className={`h-11 flex-row items-center justify-center rounded-full px-4 ${
+      focused ? "bg-primary-300" : "bg-transparent"
+    }`}
+  >
     <Image
       source={icon}
-      tintColor={focused ? "#0061FF" : "#666876"}
+      tintColor={focused ? "#FFFFFF" : "#98A2B3"}
       resizeMode="contain"
       className="size-6"
     />
-    <Text
-      className={`${
-        focused
-          ? "text-primary-300 font-rubik-medium"
-          : "text-black-200 font-rubik"
-      } text-xs w-full text-center mt-1`}
-    >
-      {title}
-    </Text>
+    {focused && (
+      <Text className="ml-2 text-xs font-rubik-semibold text-white">
+        {title}
+      </Text>
+    )}
   </View>
 );
 
@@ -37,11 +37,20 @@ const TabsLayout = () => {
       screenOptions={{
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: "white",
+          backgroundColor: "#FFFFFF",
           position: "absolute",
-          borderTopColor: "#0061FF1A",
-          borderTopWidth: 1,
-          minHeight: 70,
+          left: 20,
+          right: 20,
+          bottom: 18,
+          height: 68,
+          borderRadius: 26,
+          borderTopWidth: 0,
+          paddingHorizontal: 10,
+          elevation: 10,
+          shadowColor: "#16213E",
+          shadowOpacity: 0.12,
+          shadowRadius: 18,
+          shadowOffset: { width: 0, height: 7 },
         },
       }}
     >
