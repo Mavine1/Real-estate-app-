@@ -13,7 +13,8 @@ import { openAuthSessionAsync } from "expo-web-browser";
 
 export const config = {
   platform: "com.jsm.restate",
-  endpoint: process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT,
+  endpoint:
+    process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT ?? "https://cloud.appwrite.io/v1",
   projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID,
   databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
   galleriesCollectionId:
@@ -27,9 +28,12 @@ export const config = {
 
 export const client = new Client();
 client
-  .setEndpoint(config.endpoint!)
-  .setProject(config.projectId!)
+  .setEndpoint(config.endpoint)
   .setPlatform(config.platform!);
+
+if (config.projectId) {
+  client.setProject(config.projectId);
+}
 
 export const avatar = new Avatars(client);
 export const account = new Account(client);

@@ -40,6 +40,7 @@ app-example
 # ── Added automatically by cron-git-push ──
 .env
 .env.*
+!.env.example
 *.pfx
 build/
 .next/
