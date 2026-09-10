@@ -1,4 +1,3 @@
-import onboarding from "@/assets/images/onboarding.png";
 import onboardingBaraka from "@/assets/images/onboarding-baraka.png";
 import avatar from "@/assets/images/avatar.png";
 import newYork from "@/assets/images/new-york.png";
@@ -10,7 +9,6 @@ import map from "@/assets/images/map.png";
 import noResult from "@/assets/images/no-result.png";
 
 export default {
-  onboarding,
   onboardingBaraka,
   avatar,
   newYork,
