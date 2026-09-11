@@ -1,29 +1,106 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { Text, View } from "react-native";
+import type { ColorValue } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useGlobalContext } from "@/lib/global-provider";
 
-const TabIcon = ({ focused, icon, title }: { focused: boolean; icon: keyof typeof Ionicons.glyphMap; title: string }) => (
-  <View className={`h-11 flex-row items-center justify-center rounded-full px-3 ${focused ? "bg-primary-300" : "bg-transparent"}`}>
-    <Ionicons name={focused ? (icon.replace("-outline", "") as keyof typeof Ionicons.glyphMap) : icon} size={21} color={focused ? "#FFFFFF" : "#98A2B3"} />
-    {focused && <Text className="ml-1.5 text-[11px] font-rubik-semibold text-white">{title}</Text>}
-  </View>
-);
+const icon = (
+  outline: keyof typeof Ionicons.glyphMap,
+  filled: keyof typeof Ionicons.glyphMap
+) =>
+  function NavigationIcon({ focused, color }: { focused: boolean; color: ColorValue }) {
+    return <Ionicons name={focused ? filled : outline} size={23} color={color} />;
+  };
+
+const HomeIcon = icon("home-outline", "home");
+const SearchIcon = icon("search-outline", "search");
+const WalletIcon = icon("wallet-outline", "wallet");
+const RepairIcon = icon("construct-outline", "construct");
+const ProfileIcon = icon("person-outline", "person");
+const TenantIcon = icon("people-outline", "people");
+const PortfolioIcon = icon("business-outline", "business");
 
 export default function TabsLayout() {
   const { user } = useGlobalContext();
+  const insets = useSafeAreaInsets();
   const tenant = user?.role === "tenant";
+  const owner = user?.role === "owner";
 
   return (
-    <Tabs screenOptions={{ tabBarShowLabel: false, tabBarStyle: { backgroundColor: "#FFFFFF", position: "absolute", left: 14, right: 14, bottom: 14, height: 68, borderRadius: 26, borderTopWidth: 0, paddingHorizontal: 7, elevation: 12, shadowColor: "#16213E", shadowOpacity: 0.14, shadowRadius: 18, shadowOffset: { width: 0, height: 7 } } }}>
-      <Tabs.Screen name="index" options={{ title: "Home", headerShown: false, tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon="home-outline" title="Home" /> }} />
-      <Tabs.Screen name="explore" options={{ href: tenant ? undefined : null, title: "Properties", headerShown: false, tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon="search-outline" title="Homes" /> }} />
-      <Tabs.Screen name="management" options={{ href: tenant ? null : undefined, title: user?.role === "owner" ? "Properties" : "Tenants", headerShown: false, tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon={user?.role === "owner" ? "business-outline" : "people-outline"} title={user?.role === "owner" ? "Portfolio" : "Tenants"} /> }} />
-      <Tabs.Screen name="payments" options={{ href: tenant ? undefined : null, title: "Payments", headerShown: false, tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon="wallet-outline" title="Pay" /> }} />
-      <Tabs.Screen name="maintenance" options={{ title: "Maintenance", headerShown: false, tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon="construct-outline" title="Repairs" /> }} />
-      <Tabs.Screen name="documents" options={{ href: null, title: "Documents", headerShown: false }} />
-      <Tabs.Screen name="profile" options={{ title: "Profile", headerShown: false, tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon="person-outline" title="Profile" /> }} />
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: "#2F6BFF",
+        tabBarInactiveTintColor: "#7A8499",
+        tabBarHideOnKeyboard: true,
+        tabBarLabelStyle: {
+          fontFamily: "Rubik-Medium",
+          fontSize: 10,
+          marginTop: 2,
+        },
+        tabBarIconStyle: { marginTop: 5 },
+        tabBarItemStyle: { paddingHorizontal: 0 },
+        tabBarStyle: {
+          backgroundColor: "#FFFFFF",
+          position: "absolute",
+          left: 12,
+          right: 12,
+          bottom: Math.max(insets.bottom, 10),
+          height: 68,
+          borderRadius: 24,
+          borderTopWidth: 0,
+          paddingBottom: 8,
+          paddingTop: 4,
+          elevation: 12,
+          shadowColor: "#16213E",
+          shadowOpacity: 0.14,
+          shadowRadius: 18,
+          shadowOffset: { width: 0, height: 7 },
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{ title: "Home", tabBarIcon: HomeIcon }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          href: tenant ? undefined : null,
+          title: "Homes",
+          tabBarIcon: SearchIcon,
+        }}
+      />
+      <Tabs.Screen
+        name="management"
+        options={{
+          href: tenant ? null : undefined,
+          title: owner ? "Portfolio" : "Tenants",
+          tabBarIcon: owner ? PortfolioIcon : TenantIcon,
+        }}
+      />
+      <Tabs.Screen
+        name="payments"
+        options={{
+          href: tenant ? undefined : null,
+          title: "Pay",
+          tabBarIcon: WalletIcon,
+        }}
+      />
+      <Tabs.Screen
+        name="maintenance"
+        options={{
+          title: owner ? "Approvals" : "Repairs",
+          tabBarIcon: RepairIcon,
+        }}
+      />
+      <Tabs.Screen name="documents" options={{ href: null, title: "Documents" }} />
+      <Tabs.Screen
+        name="profile"
+        options={{ title: "Profile", tabBarIcon: ProfileIcon }}
+      />
     </Tabs>
   );
 }

@@ -10,6 +10,8 @@ export type MaintenanceStatus =
 export const tenantHome = {
   property: "The Curve Residence",
   unit: "A-204",
+  floor: "2nd Floor",
+  doorNumber: "A-204",
   address: "Kilimani, Nairobi",
   monthlyRent: 25000,
   balance: 25000,
@@ -57,4 +59,3 @@ export const ownerOverview = {
   payout: 670000,
   occupancy: 89.6,
 };
-

@@ -1,6 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ImageBackground,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import images from "@/constants/images";
@@ -53,26 +60,50 @@ export default function TenantDashboard() {
             </TouchableOpacity>
           </View>
 
-          <View className="mt-6 overflow-hidden rounded-[30px] bg-[#102A55] p-5">
-            <View className="absolute -right-10 -top-12 size-40 rounded-full bg-[#2F6BFF]/50" />
-            <View className="absolute -bottom-14 right-16 size-32 rounded-full bg-[#23C483]/20" />
-            <View className="flex-row items-start justify-between">
-              <View className="flex-1 pr-4">
-                <View className="self-start rounded-full bg-white/15 px-3 py-1.5">
+          <ImageBackground
+            source={images.tenantApartmentHome}
+            resizeMode="cover"
+            imageStyle={{ borderRadius: 30 }}
+            className="mt-6 min-h-[230px] overflow-hidden rounded-[30px]"
+          >
+            <View className="absolute inset-0 bg-[#071B42]/75" />
+            <View className="flex-1 justify-between p-5">
+              <View className="flex-row items-start justify-between">
+                <View className="self-start rounded-full bg-white/20 px-3 py-1.5">
                   <Text className="text-[11px] font-rubik-semibold text-white">MY HOME</Text>
                 </View>
-                <Text className="mt-4 text-2xl font-rubik-bold text-white">{tenantHome.unit}</Text>
-                <Text className="mt-1 text-sm font-rubik text-white/75">{tenantHome.property}</Text>
-                <View className="mt-4 flex-row items-center">
-                  <Ionicons name="location-outline" size={15} color="#B8C8EB" />
-                  <Text className="ml-1 text-xs font-rubik text-[#B8C8EB]">{tenantHome.address}</Text>
+                <View className="size-12 items-center justify-center rounded-[18px] bg-white/20">
+                  <Ionicons name="home" size={25} color="#FFFFFF" />
                 </View>
               </View>
-              <View className="size-14 items-center justify-center rounded-[20px] bg-white/15">
-                <Ionicons name="home" size={28} color="#FFFFFF" />
+
+              <View>
+                <Text className="text-[28px] font-rubik-bold text-white">
+                  {tenantHome.property}
+                </Text>
+                <View className="mt-2 flex-row items-center">
+                  <Ionicons name="location-outline" size={15} color="#DCE6FA" />
+                  <Text className="ml-1 text-xs font-rubik text-[#DCE6FA]">
+                    {tenantHome.address}
+                  </Text>
+                </View>
+                <View className="mt-4 flex-row">
+                  <View className="mr-2 flex-row items-center rounded-full bg-white/20 px-3 py-2">
+                    <Ionicons name="layers-outline" size={15} color="#FFFFFF" />
+                    <Text className="ml-1.5 text-xs font-rubik-semibold text-white">
+                      {tenantHome.floor}
+                    </Text>
+                  </View>
+                  <View className="flex-row items-center rounded-full bg-white/20 px-3 py-2">
+                    <Ionicons name="key-outline" size={15} color="#FFFFFF" />
+                    <Text className="ml-1.5 text-xs font-rubik-semibold text-white">
+                      Door {tenantHome.doorNumber}
+                    </Text>
+                  </View>
+                </View>
               </View>
             </View>
-          </View>
+          </ImageBackground>
 
           <View className="-mt-1 rounded-b-[28px] bg-white px-5 pb-5 pt-6">
             <View className="flex-row items-end justify-between">
@@ -137,4 +168,3 @@ export default function TenantDashboard() {
     </SafeAreaView>
   );
 }
-
