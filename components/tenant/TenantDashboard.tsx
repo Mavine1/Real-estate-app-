@@ -1,4 +1,5 @@
 import {
+  ArrowUpRight,
   Bell,
   CircleCheck,
   Droplets,
@@ -53,15 +54,27 @@ const QuickAction = ({
   const Icon = icon;
 
   return (
-  <TouchableOpacity onPress={onPress} activeOpacity={0.88} className="mr-3 w-[132px] overflow-hidden rounded-[22px] bg-white">
-    <ImageBackground source={image} resizeMode="cover" className="h-20 w-full">
-      <View className="absolute inset-0 bg-[#102A55]/15" />
-      <View className="absolute bottom-2 left-2 size-9 items-center justify-center rounded-xl bg-white/95">
-        <Icon size={19} color={color} strokeWidth={2.2} />
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.88}
+    className="mb-3 w-[48%] rounded-[24px] bg-white p-2.5 shadow-sm shadow-slate-200"
+  >
+    <ImageBackground
+      source={image}
+      resizeMode="cover"
+      imageStyle={{ borderRadius: 18 }}
+      className="h-24 w-full overflow-hidden rounded-[18px]"
+    >
+      <View className="absolute inset-0 bg-[#102A55]/20" />
+      <View className="absolute left-2.5 top-2.5 size-9 items-center justify-center rounded-xl bg-white/95">
+        <Icon size={18} color={color} strokeWidth={2.2} />
       </View>
     </ImageBackground>
-    <View className="min-h-[52px] justify-center px-3 py-2.5">
-      <Text numberOfLines={2} className="text-sm font-rubik-semibold text-black-300">{label}</Text>
+    <View className="flex-row items-center justify-between px-1 pb-1 pt-3">
+      <Text numberOfLines={1} className="flex-1 text-sm font-rubik-semibold text-black-300">{label}</Text>
+      <View className="ml-2 size-7 items-center justify-center rounded-full" style={{ backgroundColor: `${color}14` }}>
+        <ArrowUpRight size={14} color={color} strokeWidth={2.3} />
+      </View>
     </View>
   </TouchableOpacity>
   );
@@ -173,12 +186,12 @@ export default function TenantDashboard() {
 
           <Text className="mb-3 mt-7 text-lg font-rubik-bold text-black-300">Quick actions</Text>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="pl-5 pr-2">
+        <View className="flex-row flex-wrap justify-between px-5">
           <QuickAction icon={Wallet} label="Payments" color="#2F6BFF" image={images.quickActionPayment} onPress={() => router.push("/(root)/(tabs)/payments")} />
           <QuickAction icon={Wrench} label="Report issue" color="#E66B2E" image={images.quickActionMaintenance} onPress={() => router.push("/(root)/(tabs)/maintenance")} />
           <QuickAction icon={FileText} label="Documents" color="#7A5AF8" image={images.quickActionDocuments} onPress={() => router.push("/(root)/(tabs)/documents")} />
           <QuickAction icon={MessageCircle} label="Contact agent" color="#159B6C" image={images.quickActionAgent} onPress={() => router.push("/(root)/(tabs)/maintenance")} />
-        </ScrollView>
+        </View>
 
         <View className="px-5">
           <View className="mb-3 mt-7 flex-row items-center justify-between">
