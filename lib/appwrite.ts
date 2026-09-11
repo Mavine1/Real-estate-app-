@@ -28,6 +28,7 @@ export const config = {
   propertiesCollectionId:
     process.env.EXPO_PUBLIC_APPWRITE_PROPERTIES_COLLECTION_ID,
   bucketId: process.env.EXPO_PUBLIC_APPWRITE_BUCKET_ID,
+  payHeroFunctionId: process.env.EXPO_PUBLIC_APPWRITE_PAYHERO_FUNCTION_ID,
 };
 
 export const client = new Client();
