@@ -44,7 +44,7 @@ export async function initiatePayHeroPayment(
     }),
     async: false,
     xpath: "/payments/initiate",
-    method: ExecutionMethod.Post,
+    method: ExecutionMethod.POST,
     headers: { "content-type": "application/json" },
   });
 
@@ -62,4 +62,3 @@ export async function initiatePayHeroPayment(
 
   return result;
 }
-
