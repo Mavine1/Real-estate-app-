@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { loginWithEmail, loginWithGoogle } from "@/lib/appwrite";
@@ -18,6 +19,7 @@ export default function Login() {
   const { setUser, refetch } = useGlobalContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const completeLogin = async (type: "email" | "google") => {
@@ -69,15 +71,30 @@ export default function Login() {
           keyboardType="email-address"
           className="mt-8 h-14 rounded-2xl border border-primary-200 bg-white px-4 font-rubik text-black-300"
         />
-        <TextInput
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Password"
-          placeholderTextColor="#98A2B3"
-          secureTextEntry
-          autoComplete="password"
-          className="mt-4 h-14 rounded-2xl border border-primary-200 bg-white px-4 font-rubik text-black-300"
-        />
+        <View className="relative mt-4">
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+            placeholderTextColor="#98A2B3"
+            secureTextEntry={!showPassword}
+            autoComplete="password"
+            className="h-14 rounded-2xl border border-primary-200 bg-white pl-4 pr-14 font-rubik text-black-300"
+          />
+          <TouchableOpacity
+            onPress={() => setShowPassword((visible) => !visible)}
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+            hitSlop={10}
+            className="absolute right-4 top-0 h-14 items-center justify-center"
+          >
+            <Ionicons
+              name={showPassword ? "eye-off-outline" : "eye-outline"}
+              size={22}
+              color="#667085"
+            />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           disabled={submitting}
