@@ -7,24 +7,28 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Redirect } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import icons from "@/constants/icons";
 import images from "@/constants/images";
-import { login } from "@/lib/appwrite";
+import { loginWithGoogle } from "@/lib/appwrite";
 import { useGlobalContext } from "@/lib/global-provider";
 
 const Auth = () => {
-  const { refetch, loading, isLogged } = useGlobalContext();
+  const { loading, isLogged, setUser, refetch } = useGlobalContext();
 
   if (!loading && isLogged) return <Redirect href="/" />;
 
   const handleLogin = async () => {
-    const result = await login();
-    if (result) {
+    console.log("[Auth] Login button pressed");
+    const user = await loginWithGoogle();
+    if (user) {
+      setUser(user);
       await refetch();
+      console.log("[Auth] User saved; navigating to home");
+      router.replace("/(root)/(tabs)");
     } else {
       Alert.alert("Unable to sign in", "Google sign-in was not completed.");
     }
@@ -55,9 +59,33 @@ const Auth = () => {
             today.
           </Text>
 
-          <Text className="mb-3 text-center text-xs font-rubik text-white/70">
-            Continue with
-          </Text>
+          <View className="mb-6 flex-row gap-3">
+            <TouchableOpacity
+              onPress={() => router.push("/login")}
+              activeOpacity={0.85}
+              className="h-13 flex-1 items-center justify-center rounded-full bg-primary-300 py-4"
+            >
+              <Text className="text-sm font-rubik-bold text-white">Log in</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => router.push("/sign-up")}
+              activeOpacity={0.85}
+              className="h-13 flex-1 items-center justify-center rounded-full border border-white/30 bg-white py-4"
+            >
+              <Text className="text-sm font-rubik-bold text-[#102A55]">
+                Sign up
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View className="mb-4 flex-row items-center">
+            <View className="h-px flex-1 bg-white/25" />
+            <Text className="mx-3 text-center text-xs font-rubik text-white/70">
+              or continue with
+            </Text>
+            <View className="h-px flex-1 bg-white/25" />
+          </View>
 
           <TouchableOpacity
             onPress={handleLogin}

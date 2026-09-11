@@ -1,3 +1,5 @@
+import "react-native-url-polyfill/auto";
+
 import {
   Client,
   Account,
@@ -12,11 +14,13 @@ import * as Linking from "expo-linking";
 import { openAuthSessionAsync } from "expo-web-browser";
 
 export const config = {
-  platform: "com.jsm.restate",
+  platform: "com.barakahomes.app",
   endpoint:
-    process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT ?? "https://cloud.appwrite.io/v1",
+    process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT ?? "https://fra.cloud.appwrite.io/v1",
   projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID,
   databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
+  userProfilesCollectionId:
+    process.env.EXPO_PUBLIC_APPWRITE_USER_PROFILES_COLLECTION_ID,
   galleriesCollectionId:
     process.env.EXPO_PUBLIC_APPWRITE_GALLERIES_COLLECTION_ID,
   reviewsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_REVIEWS_COLLECTION_ID,
@@ -40,35 +44,159 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
 
-export async function login() {
+export type AppUser = {
+  $id: string;
+  name: string;
+  email: string;
+  avatar: string;
+};
+
+const withTimeout = async <T>(request: Promise<T>, timeoutMs = 12_000) => {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+
   try {
-    const redirectUri = Linking.createURL("/");
+    return await Promise.race([
+      request,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error("Appwrite request timed out. Check your connection and try again.")),
+          timeoutMs
+        );
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+};
 
-    const response = await account.createOAuth2Token(
-      OAuthProvider.Google,
-      redirectUri
+const toAppUser = (user: { $id: string; name: string; email: string }): AppUser => ({
+  $id: user.$id,
+  name: user.name,
+  email: user.email,
+  avatar: avatar.getInitials(user.name).toString(),
+});
+
+const syncUserProfile = async (user: AppUser, provider: "google" | "email") => {
+  // Google users are always saved in Appwrite Auth. This optional document
+  // mirrors the profile into a Database collection when one is configured.
+  if (!config.databaseId || !config.userProfilesCollectionId) return false;
+
+  const profile = {
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar,
+    provider,
+  };
+
+  try {
+    await databases.updateDocument(
+      config.databaseId,
+      config.userProfilesCollectionId,
+      user.$id,
+      profile
     );
-    if (!response) throw new Error("Create OAuth2 token failed");
+  } catch {
+    await databases.createDocument(
+      config.databaseId,
+      config.userProfilesCollectionId,
+      user.$id,
+      profile
+    );
+  }
 
-    const browserResult = await openAuthSessionAsync(
-      response.toString(),
-      redirectUri
+  return true;
+};
+
+const finishAuthenticatedUser = async (provider: "google" | "email") => {
+  const user = toAppUser(await withTimeout(account.get()));
+  await withTimeout(
+    account.updatePrefs({
+      prefs: { provider, avatar: user.avatar },
+    })
+  );
+
+  try {
+    const profileSaved = await syncUserProfile(user, provider);
+    console.log(
+      profileSaved
+        ? "[Auth] User profile saved to the Appwrite database"
+        : "[Auth] User saved in Appwrite Auth; profile collection is not configured"
+    );
+  } catch (error) {
+    console.warn("[Auth] User profile database sync skipped:", error);
+  }
+
+  return user;
+};
+
+export async function loginWithGoogle(): Promise<AppUser | null> {
+  try {
+    // Expo Router creates the active Expo Go callback URL, including the
+    // current Metro host and port (for example, exp://192.168.1.68:8081).
+    const redirectUri = Linking.createURL("/");
+    console.log("[Auth] OAuth callback URL:", redirectUri);
+    const response = account.createOAuth2Token({
+      provider: OAuthProvider.Google,
+      success: redirectUri,
+      failure: redirectUri,
+    });
+    if (!response) throw new Error("Could not create the Google login URL");
+
+    console.log("[Auth] Opening Google sign-in");
+
+    const browserResult = await withTimeout(
+      openAuthSessionAsync(response.toString(), redirectUri),
+      120_000
     );
     if (browserResult.type !== "success")
-      throw new Error("Create OAuth2 token failed");
+      throw new Error("Google login was cancelled");
 
+    console.log("[Auth] Google sign-in callback received");
     const url = new URL(browserResult.url);
     const secret = url.searchParams.get("secret")?.toString();
     const userId = url.searchParams.get("userId")?.toString();
     if (!secret || !userId) throw new Error("Create OAuth2 token failed");
 
-    const session = await account.createSession(userId, secret);
+    const session = await withTimeout(
+      account.createSession({ userId, secret })
+    );
     if (!session) throw new Error("Failed to create session");
 
-    return true;
+    console.log("[Auth] Appwrite session created");
+
+    return await finishAuthenticatedUser("google");
   } catch (error) {
-    console.error(error);
-    return false;
+    console.error("[Auth] Google sign-in failed:", error);
+    return null;
+  }
+}
+
+export async function loginWithEmail(email: string, password: string): Promise<AppUser | null> {
+  try {
+    await withTimeout(account.createEmailPasswordSession({ email, password }));
+    console.log("[Auth] Email session created");
+    return await finishAuthenticatedUser("email");
+  } catch (error) {
+    console.error("[Auth] Email login failed:", error);
+    return null;
+  }
+}
+
+export async function signUpWithEmail(
+  name: string,
+  email: string,
+  password: string
+): Promise<AppUser | null> {
+  try {
+    await withTimeout(
+      account.create({ userId: ID.unique(), name: name.trim(), email, password })
+    );
+    await withTimeout(account.createEmailPasswordSession({ email, password }));
+    console.log("[Auth] Email account and session created");
+    return await finishAuthenticatedUser("email");
+  } catch (error) {
+    console.error("[Auth] Email sign-up failed:", error);
+    return null;
   }
 }
 
@@ -84,19 +212,20 @@ export async function logout() {
 
 export async function getCurrentUser() {
   try {
-    const result = await account.get();
+    const result = await withTimeout(account.get());
     if (result.$id) {
-      const userAvatar = avatar.getInitials(result.name);
-
-      return {
-        ...result,
-        avatar: userAvatar.toString(),
-      };
+      console.log("[Auth] Active user restored");
+      return toAppUser(result);
     }
 
     return null;
   } catch (error) {
-    console.log(error);
+    const code =
+      typeof error === "object" && error && "code" in error
+        ? (error as { code?: number }).code
+        : undefined;
+    if (code !== 401)
+      console.log("[Auth] Could not restore user session:", error);
     return null;
   }
 }

@@ -8,9 +8,11 @@
     "scheme": "barakahomes",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.barakahomes.app"
     },
     "android": {
+      "package": "com.barakahomes.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/favicon.png",
         "backgroundColor": "#ffffff"

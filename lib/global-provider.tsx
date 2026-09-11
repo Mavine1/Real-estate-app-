@@ -1,21 +1,15 @@
-import React, { createContext, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode, useState } from "react";
 
-import { getCurrentUser } from "./appwrite";
+import { AppUser, getCurrentUser } from "./appwrite";
 import { useAppwrite } from "./useAppwrite";
 import { Redirect } from "expo-router";
 
 interface GlobalContextType {
   isLogged: boolean;
-  user: User | null;
+  user: AppUser | null;
   loading: boolean;
   refetch: () => Promise<void>;
-}
-
-interface User {
-  $id: string;
-  name: string;
-  email: string;
-  avatar: string;
+  setUser: (user: AppUser | null) => void;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -26,12 +20,20 @@ interface GlobalProviderProps {
 
 export const GlobalProvider = ({ children }: GlobalProviderProps) => {
   const {
-    data: user,
+    data: restoredUser,
     loading,
     refetch,
   } = useAppwrite({
     fn: getCurrentUser,
   });
+
+  // `undefined` means authentication has not been changed in this session yet.
+  // `null` is an explicit logged-out state and must not fall back to a stale
+  // user returned by the initial session restore request.
+  const [sessionUser, setSessionUser] = useState<AppUser | null | undefined>(
+    undefined
+  );
+  const user = sessionUser === undefined ? restoredUser : sessionUser;
 
   const isLogged = !!user;
 
@@ -42,6 +44,7 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
         user,
         loading,
         refetch,
+        setUser: setSessionUser,
       }}
     >
       {children}

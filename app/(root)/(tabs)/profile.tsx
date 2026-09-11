@@ -46,12 +46,13 @@ const SettingsItem = ({
 );
 
 const Profile = () => {
-  const { user, refetch } = useGlobalContext();
+  const { user, refetch, setUser } = useGlobalContext();
 
   const handleLogout = async () => {
     const result = await logout();
     if (result) {
       Alert.alert("Success", "Logged out successfully");
+      setUser(null);
       refetch();
     } else {
       Alert.alert("Error", "Failed to logout");
