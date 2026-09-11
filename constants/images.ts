@@ -10,7 +10,7 @@ import noResult from "@/assets/images/no-result.png";
 import logoMark from "@/assets/images/baraka-logo-mark-v2.png";
 import logoWordmark from "@/assets/images/baraka-logo-wordmark.png";
 import authNairobi from "@/assets/images/auth-nairobi-residence.png";
-import defaultProfileAvatar from "@/assets/images/default-profile-avatar.jpg";
+import defaultProfileAvatar from "@/assets/images/default-profile-avatar-head.png";
 import tenantApartmentHome from "@/assets/images/tenant-apartment-home.jpg";
 
 export default {
