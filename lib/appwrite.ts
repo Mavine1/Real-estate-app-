@@ -92,6 +92,22 @@ export const getAuthenticationErrorMessage = (error: unknown) => {
   return message || "Authentication could not be completed. Please try again.";
 };
 
+const logAuthenticationFailure = (method: string, error: unknown) => {
+  const { code, type, message } = getErrorDetails(error);
+  const expectedRejection =
+    code === 401 ||
+    code === 429 ||
+    type?.includes("invalid_credentials") ||
+    message?.toLowerCase().includes("cancelled");
+
+  if (expectedRejection) {
+    console.warn(`[Auth] ${method}: ${getAuthenticationErrorMessage(error)}`);
+    return;
+  }
+
+  console.error(`[Auth] Unexpected ${method} error:`, error);
+};
+
 const clearCurrentSession = async () => {
   try {
     await withTimeout(account.deleteSession("current"));
@@ -228,7 +244,7 @@ export async function loginWithGoogle(): Promise<AppUser | null> {
 
     return await finishAuthenticatedUser("google");
   } catch (error) {
-    console.error("[Auth] Google sign-in failed:", error);
+    logAuthenticationFailure("Google sign-in failed", error);
     throw error;
   }
 }
@@ -240,7 +256,7 @@ export async function loginWithEmail(email: string, password: string): Promise<A
     console.log("[Auth] Email session created");
     return await finishAuthenticatedUser("email");
   } catch (error) {
-    console.error("[Auth] Email login failed:", error);
+    logAuthenticationFailure("Email sign-in failed", error);
     throw error;
   }
 }
@@ -259,7 +275,7 @@ export async function signUpWithEmail(
     console.log("[Auth] Email account and session created");
     return await finishAuthenticatedUser("email");
   } catch (error) {
-    console.error("[Auth] Email sign-up failed:", error);
+    logAuthenticationFailure("Email sign-up failed", error);
     throw error;
   }
 }

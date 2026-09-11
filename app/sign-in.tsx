@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import icons from "@/constants/icons";
 import images from "@/constants/images";
-import { loginWithGoogle } from "@/lib/appwrite";
+import { getAuthenticationErrorMessage, loginWithGoogle } from "@/lib/appwrite";
 import { useGlobalContext } from "@/lib/global-provider";
 
 const Auth = () => {
@@ -23,14 +23,16 @@ const Auth = () => {
 
   const handleLogin = async () => {
     console.log("[Auth] Login button pressed");
-    const user = await loginWithGoogle();
-    if (user) {
+    try {
+      const user = await loginWithGoogle();
+      if (!user) throw new Error("Authentication returned no user.");
+
       setUser(user);
       await refetch();
       console.log("[Auth] User saved; navigating to home");
       router.replace("/(root)/(tabs)");
-    } else {
-      Alert.alert("Unable to sign in", "Google sign-in was not completed.");
+    } catch (error) {
+      Alert.alert("Google sign-in failed", getAuthenticationErrorMessage(error));
     }
   };
 

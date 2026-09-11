@@ -10,7 +10,11 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 import AuthScreenLayout from "@/components/AuthScreenLayout";
-import { loginWithEmail, loginWithGoogle } from "@/lib/appwrite";
+import {
+  getAuthenticationErrorMessage,
+  loginWithEmail,
+  loginWithGoogle,
+} from "@/lib/appwrite";
 import { useGlobalContext } from "@/lib/global-provider";
 
 export default function Login() {
@@ -27,21 +31,26 @@ export default function Login() {
     }
 
     setSubmitting(true);
-    const user =
-      type === "google"
-        ? await loginWithGoogle()
-        : await loginWithEmail(email.trim().toLowerCase(), password);
-    setSubmitting(false);
+    try {
+      const user =
+        type === "google"
+          ? await loginWithGoogle()
+          : await loginWithEmail(email.trim().toLowerCase(), password);
 
-    if (!user) {
-      Alert.alert("Unable to sign in", "Check your details or try Google sign-in again.");
-      return;
+      if (!user) throw new Error("Authentication returned no user.");
+
+      setUser(user);
+      await refetch();
+      console.log(`[Auth] ${type} login complete; navigating to home`);
+      router.replace("/(root)/(tabs)");
+    } catch (error) {
+      Alert.alert(
+        type === "google" ? "Google sign-in failed" : "Email sign-in failed",
+        getAuthenticationErrorMessage(error)
+      );
+    } finally {
+      setSubmitting(false);
     }
-
-    setUser(user);
-    await refetch();
-    console.log("[Auth] Email login complete; navigating to home");
-    router.replace("/(root)/(tabs)");
   };
 
   return (

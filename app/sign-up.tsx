@@ -10,7 +10,11 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 import AuthScreenLayout from "@/components/AuthScreenLayout";
-import { loginWithGoogle, signUpWithEmail } from "@/lib/appwrite";
+import {
+  getAuthenticationErrorMessage,
+  loginWithGoogle,
+  signUpWithEmail,
+} from "@/lib/appwrite";
 import { useGlobalContext } from "@/lib/global-provider";
 
 export default function SignUp() {
@@ -34,21 +38,26 @@ export default function SignUp() {
     }
 
     setSubmitting(true);
-    const user =
-      type === "google"
-        ? await loginWithGoogle()
-        : await signUpWithEmail(name, email.trim().toLowerCase(), password);
-    setSubmitting(false);
+    try {
+      const user =
+        type === "google"
+          ? await loginWithGoogle()
+          : await signUpWithEmail(name, email.trim().toLowerCase(), password);
 
-    if (!user) {
-      Alert.alert("Unable to create account", "That email may already be registered. Try logging in instead.");
-      return;
+      if (!user) throw new Error("Authentication returned no user.");
+
+      setUser(user);
+      await refetch();
+      console.log(`[Auth] ${type} account creation complete; navigating to home`);
+      router.replace("/(root)/(tabs)");
+    } catch (error) {
+      Alert.alert(
+        type === "google" ? "Google sign-in failed" : "Unable to create account",
+        getAuthenticationErrorMessage(error)
+      );
+    } finally {
+      setSubmitting(false);
     }
-
-    setUser(user);
-    await refetch();
-    console.log("[Auth] Account creation complete; navigating to home");
-    router.replace("/(root)/(tabs)");
   };
 
   return (
