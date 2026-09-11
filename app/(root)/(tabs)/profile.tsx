@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   Image,
   ImageSourcePropType,
@@ -8,11 +9,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useState } from "react";
+import * as ImagePicker from "expo-image-picker";
 
-import { logout } from "@/lib/appwrite";
+import { logout, updateUserAvatar } from "@/lib/appwrite";
 import { useGlobalContext } from "@/lib/global-provider";
 
 import icons from "@/constants/icons";
+import images from "@/constants/images";
 import { settings } from "@/constants/data";
 
 interface SettingsItemProp {
@@ -47,6 +51,71 @@ const SettingsItem = ({
 
 const Profile = () => {
   const { user, refetch, setUser } = useGlobalContext();
+  const [updatingAvatar, setUpdatingAvatar] = useState(false);
+
+  const handleChangeAvatar = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert(
+        "Photo access required",
+        "Allow photo-library access to choose a profile picture."
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (result.canceled) return;
+
+    const asset = result.assets[0];
+    const mimeType = asset.mimeType ?? "image/jpeg";
+    const extensionByMime: Record<string, string> = {
+      "image/jpeg": "jpg",
+      "image/jpg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+    };
+    const extension = extensionByMime[mimeType];
+
+    if (!extension) {
+      Alert.alert("Unsupported image", "Choose a JPG, PNG, or WebP image.");
+      return;
+    }
+
+    let fileSize = asset.fileSize ?? asset.file?.size;
+    if (!fileSize) {
+      const response = await fetch(asset.uri);
+      fileSize = (await response.blob()).size;
+    }
+
+    if (fileSize > 5 * 1024 * 1024) {
+      Alert.alert("Image too large", "Choose an image smaller than 5 MB.");
+      return;
+    }
+
+    setUpdatingAvatar(true);
+    try {
+      const updatedUser = await updateUserAvatar({
+        uri: asset.uri,
+        name: `avatar-${Date.now()}.${extension}`,
+        type: mimeType,
+        size: fileSize,
+      });
+      setUser(updatedUser);
+      await refetch();
+      Alert.alert("Profile updated", "Your new profile photo has been saved.");
+    } catch (error) {
+      console.error("[Profile] Avatar update failed:", error);
+      Alert.alert("Upload failed", "We could not save that photo. Try again.");
+    } finally {
+      setUpdatingAvatar(false);
+    }
+  };
 
   const handleLogout = async () => {
     const result = await logout();
@@ -73,11 +142,27 @@ const Profile = () => {
         <View className="flex flex-row justify-center mt-5">
           <View className="flex flex-col items-center relative mt-5">
             <Image
-              source={{ uri: user?.avatar }}
+              source={
+                user?.avatar
+                  ? { uri: user.avatar }
+                  : images.defaultProfileAvatar
+              }
               className="size-44 relative rounded-full"
             />
-            <TouchableOpacity className="absolute bottom-11 right-2">
-              <Image source={icons.edit} className="size-9" />
+            <TouchableOpacity
+              className="absolute bottom-11 right-2"
+              onPress={handleChangeAvatar}
+              disabled={updatingAvatar}
+              accessibilityRole="button"
+              accessibilityLabel="Change profile photo"
+            >
+              {updatingAvatar ? (
+                <View className="size-9 items-center justify-center rounded-full bg-primary-300">
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                </View>
+              ) : (
+                <Image source={icons.edit} className="size-9" />
+              )}
             </TouchableOpacity>
 
             <Text className="text-2xl font-rubik-bold mt-2">{user?.name}</Text>

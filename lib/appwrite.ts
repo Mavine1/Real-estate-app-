@@ -134,13 +134,20 @@ const toAppUser = (user: {
   email: string;
   labels?: string[];
   prefs?: Record<string, unknown>;
-}): AppUser => ({
-  $id: user.$id,
-  name: user.name,
-  email: user.email,
-  avatar: avatar.getInitials(user.name).toString(),
-  role: getUserRole(user.labels, user.prefs?.provider),
-});
+}): AppUser => {
+  const savedAvatar = user.prefs?.avatar;
+
+  return {
+    $id: user.$id,
+    name: user.name,
+    email: user.email,
+    avatar:
+      typeof savedAvatar === "string" && /^https?:\/\//.test(savedAvatar)
+        ? savedAvatar
+        : "",
+    role: getUserRole(user.labels, user.prefs?.provider),
+  };
+};
 
 const syncUserProfile = async (user: AppUser, provider: "google" | "email") => {
   // Google users are always saved in Appwrite Auth. This optional document
@@ -181,15 +188,14 @@ const finishAuthenticatedUser = async (provider: "google" | "email") => {
     ...accountUser,
     prefs: { ...accountUser.prefs, provider },
   });
-  await withTimeout(
-    account.updatePrefs({
-      prefs: {
-        ...accountUser.prefs,
-        provider,
-        avatar: user.avatar,
-      },
-    })
-  );
+  const prefs: Record<string, unknown> = {
+    ...(accountUser.prefs as Record<string, unknown>),
+    provider,
+  };
+  if (user.avatar) prefs.avatar = user.avatar;
+  else delete prefs.avatar;
+
+  await withTimeout(account.updatePrefs({ prefs }));
 
   try {
     const profileSaved = await syncUserProfile(user, provider);
@@ -204,6 +210,70 @@ const finishAuthenticatedUser = async (provider: "google" | "email") => {
 
   return user;
 };
+
+export type AvatarUpload = {
+  uri: string;
+  name: string;
+  type: string;
+  size: number;
+};
+
+export async function updateUserAvatar(file: AvatarUpload): Promise<AppUser> {
+  if (!config.bucketId)
+    throw new Error("The Appwrite image bucket is not configured.");
+
+  const accountUser = await withTimeout(account.get());
+  const previousFileId =
+    typeof accountUser.prefs?.avatarFileId === "string"
+      ? accountUser.prefs.avatarFileId
+      : null;
+
+  const uploadedFile = await withTimeout(
+    storage.createFile({
+      bucketId: config.bucketId,
+      fileId: ID.unique(),
+      file,
+    }),
+    60_000
+  );
+
+  const avatarUrl = storage
+    .getFileViewURL(config.bucketId, uploadedFile.$id)
+    .toString();
+  const prefs = {
+    ...accountUser.prefs,
+    avatar: avatarUrl,
+    avatarFileId: uploadedFile.$id,
+  };
+
+  try {
+    await withTimeout(account.updatePrefs({ prefs }));
+  } catch (error) {
+    await storage
+      .deleteFile({ bucketId: config.bucketId, fileId: uploadedFile.$id })
+      .catch(() => undefined);
+    throw error;
+  }
+
+  if (previousFileId && previousFileId !== uploadedFile.$id) {
+    await storage
+      .deleteFile({ bucketId: config.bucketId, fileId: previousFileId })
+      .catch((error) =>
+        console.warn("[Profile] Previous avatar cleanup skipped:", error)
+      );
+  }
+
+  const user = toAppUser({ ...accountUser, prefs });
+  const provider = accountUser.prefs?.provider === "google" ? "google" : "email";
+
+  try {
+    await syncUserProfile(user, provider);
+  } catch (error) {
+    console.warn("[Profile] Avatar profile sync skipped:", error);
+  }
+
+  return user;
+}
 
 export async function loginWithGoogle(): Promise<AppUser | null> {
   try {

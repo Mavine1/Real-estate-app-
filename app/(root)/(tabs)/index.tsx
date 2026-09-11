@@ -11,6 +11,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import icons from "@/constants/icons";
+import images from "@/constants/images";
 import Search from "@/components/Search";
 import Filters from "@/components/Filters";
 import NoResults from "@/components/NoResults";
@@ -67,7 +68,11 @@ const Home = () => {
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
                 <Image
-                  source={{ uri: user?.avatar }}
+                  source={
+                    user?.avatar
+                      ? { uri: user.avatar }
+                      : images.defaultProfileAvatar
+                  }
                   className="size-12 rounded-full border-2 border-white"
                 />
                 <View className="ml-3">
