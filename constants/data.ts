@@ -1,4 +1,21 @@
-import icons from "./icons";
+import {
+  Bell,
+  CalendarDays,
+  CircleHelp,
+  Dumbbell,
+  Languages,
+  PawPrint,
+  PersonStanding,
+  ShieldCheck,
+  Shirt,
+  Soup,
+  Waves,
+  Wifi,
+  CarFront,
+  UserRound,
+  UsersRound,
+  WalletCards,
+} from "lucide-react-native";
 import images from "./images";
 
 export const cards = [
@@ -70,70 +87,70 @@ export const categories = [
 export const settings = [
   {
     title: "My Bookings",
-    icon: icons.calendar,
+    icon: CalendarDays,
   },
   {
     title: "Payments",
-    icon: icons.wallet,
+    icon: WalletCards,
   },
   {
     title: "Profile",
-    icon: icons.person,
+    icon: UserRound,
   },
   {
     title: "Notifications",
-    icon: icons.bell,
+    icon: Bell,
   },
   {
     title: "Security",
-    icon: icons.shield,
+    icon: ShieldCheck,
   },
   {
     title: "Language",
-    icon: icons.language,
+    icon: Languages,
   },
   {
     title: "Help Center",
-    icon: icons.info,
+    icon: CircleHelp,
   },
   {
     title: "Invite Friends",
-    icon: icons.people,
+    icon: UsersRound,
   },
 ];
 
 export const facilities = [
   {
     title: "Laundry",
-    icon: icons.laundry,
+    icon: Shirt,
   },
   {
     title: "Car Parking",
-    icon: icons.carPark,
+    icon: CarFront,
   },
   {
     title: "Sports Center",
-    icon: icons.run,
+    icon: PersonStanding,
   },
   {
     title: "Cutlery",
-    icon: icons.cutlery,
+    icon: Soup,
   },
   {
     title: "Gym",
-    icon: icons.dumbell,
+    icon: Dumbbell,
   },
   {
     title: "Swimming pool",
-    icon: icons.swim,
+    icon: Waves,
   },
   {
     title: "Wifi",
-    icon: icons.wifi,
+    icon: Wifi,
   },
   {
     title: "Pet Center",
-    icon: icons.dog,
+    icon: PawPrint,
   },
 ];
 

@@ -1,7 +1,14 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Models } from "react-native-appwrite";
+import {
+  Bath,
+  BedDouble,
+  CarFront,
+  Heart,
+  MapPin,
+  type LucideIcon,
+} from "lucide-react-native";
 
-import icons from "@/constants/icons";
 import { formatPrice, nairobiAddress } from "@/lib/format";
 
 interface Props {
@@ -9,9 +16,9 @@ interface Props {
   onPress?: () => void;
 }
 
-const Feature = ({ icon, label }: { icon: number; label: string }) => (
+const Feature = ({ icon: Icon, label }: { icon: LucideIcon; label: string }) => (
   <View className="flex-row items-center rounded-full bg-primary-100 px-3 py-2">
-    <Image source={icon} className="size-4" tintColor="#667085" />
+    <Icon size={16} color="#667085" strokeWidth={2.1} />
     <Text className="ml-1.5 text-xs font-rubik-medium text-black-200">
       {label}
     </Text>
@@ -34,7 +41,7 @@ export const Card = ({ item, onPress }: Props) => (
       </View>
 
       <View className="absolute right-3 top-3 size-9 items-center justify-center rounded-full bg-white/95">
-        <Image source={icons.heart} className="size-4" tintColor="#2F6BFF" />
+        <Heart size={17} color="#2F6BFF" strokeWidth={2.2} />
       </View>
     </View>
 
@@ -52,7 +59,7 @@ export const Card = ({ item, onPress }: Props) => (
       </View>
 
       <View className="mt-1.5 flex-row items-center">
-        <Image source={icons.location} className="size-4" tintColor="#667085" />
+        <MapPin size={16} color="#667085" strokeWidth={2.1} />
         <Text className="ml-1.5 text-xs font-rubik text-black-200">
           {nairobiAddress}
         </Text>
@@ -61,9 +68,9 @@ export const Card = ({ item, onPress }: Props) => (
       <View className="my-3 h-px bg-primary-100" />
 
       <View className="flex-row gap-2">
-        <Feature icon={icons.bed} label={`${item.bedrooms ?? 0} Beds`} />
-        <Feature icon={icons.bath} label={`${item.bathrooms ?? 0} Baths`} />
-        <Feature icon={icons.carPark} label="Parking" />
+        <Feature icon={BedDouble} label={`${item.bedrooms ?? 0} Beds`} />
+        <Feature icon={Bath} label={`${item.bathrooms ?? 0} Baths`} />
+        <Feature icon={CarFront} label="Parking" />
       </View>
     </View>
   </TouchableOpacity>

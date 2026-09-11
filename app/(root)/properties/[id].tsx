@@ -1,7 +1,6 @@
 import {
   ActivityIndicator,
   Image,
-  ImageSourcePropType,
   Platform,
   ScrollView,
   Text,
@@ -9,21 +8,31 @@ import {
   View,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
+import {
+  ArrowLeft,
+  Bath,
+  BedDouble,
+  CarFront,
+  Heart,
+  MapPin,
+  Ruler,
+  Star,
+  type LucideIcon,
+} from "lucide-react-native";
 
-import icons from "@/constants/icons";
 import { useAppwrite } from "@/lib/useAppwrite";
 import { getPropertyById } from "@/lib/appwrite";
 import { formatPrice, nairobiAddress } from "@/lib/format";
 
 const DetailChip = ({
-  icon,
+  icon: Icon,
   label,
 }: {
-  icon: ImageSourcePropType;
+  icon: LucideIcon;
   label: string;
 }) => (
   <View className="flex-row items-center rounded-full bg-primary-100 px-3 py-2.5">
-    <Image source={icon} className="size-4" tintColor="#667085" />
+    <Icon size={16} color="#667085" strokeWidth={2.1} />
     <Text className="ml-1.5 text-xs font-rubik-medium text-black-200">
       {label}
     </Text>
@@ -67,7 +76,7 @@ const PropertyDetails = () => {
               onPress={() => router.back()}
               className="size-11 items-center justify-center rounded-full bg-white/95"
             >
-              <Image source={icons.backArrow} className="size-5" />
+              <ArrowLeft size={20} color="#17213C" strokeWidth={2.2} />
             </TouchableOpacity>
 
             <Text className="text-base font-rubik-semibold text-white">
@@ -75,7 +84,7 @@ const PropertyDetails = () => {
             </Text>
 
             <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white/95">
-              <Image source={icons.heart} className="size-5" tintColor="#2F6BFF" />
+              <Heart size={20} color="#2F6BFF" strokeWidth={2.2} />
             </TouchableOpacity>
           </View>
         </View>
@@ -91,7 +100,7 @@ const PropertyDetails = () => {
           </View>
 
           <View className="mt-2 flex-row items-center">
-            <Image source={icons.location} className="size-4" tintColor="#667085" />
+            <MapPin size={16} color="#667085" strokeWidth={2.1} />
             <Text className="ml-1.5 text-sm font-rubik text-black-200">
               {nairobiAddress}
             </Text>
@@ -103,10 +112,10 @@ const PropertyDetails = () => {
           </Text>
 
           <View className="mt-6 flex-row flex-wrap gap-2">
-            <DetailChip icon={icons.bed} label={`${property?.bedrooms ?? 0} Beds`} />
-            <DetailChip icon={icons.bath} label={`${property?.bathrooms ?? 0} Baths`} />
-            <DetailChip icon={icons.carPark} label="Parking" />
-            <DetailChip icon={icons.area} label={`${property?.area ?? 0} sqft`} />
+            <DetailChip icon={BedDouble} label={`${property?.bedrooms ?? 0} Beds`} />
+            <DetailChip icon={Bath} label={`${property?.bathrooms ?? 0} Baths`} />
+            <DetailChip icon={CarFront} label="Parking" />
+            <DetailChip icon={Ruler} label={`${property?.area ?? 0} sqft`} />
           </View>
 
           <View className="mt-7 rounded-[24px] bg-white p-5 shadow-sm shadow-slate-200">
@@ -120,7 +129,7 @@ const PropertyDetails = () => {
               <View className="items-end">
                 <Text className="text-xs font-rubik text-black-100">Rating</Text>
                 <View className="mt-1 flex-row items-center">
-                  <Image source={icons.star} className="size-4" />
+                  <Star size={17} color="#F5A623" fill="#F5A623" strokeWidth={2} />
                   <Text className="ml-1 text-base font-rubik-bold text-black-300">
                     {property?.rating ?? 0}
                   </Text>

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, Image, TextInput } from "react-native";
+import { View, TouchableOpacity, TextInput } from "react-native";
 import { useDebouncedCallback } from "use-debounce";
+import { Search as SearchIcon, SlidersHorizontal } from "lucide-react-native";
 
-import icons from "@/constants/icons";
 import { useLocalSearchParams, router } from "expo-router";
 
 const Search = () => {
@@ -21,7 +21,7 @@ const Search = () => {
   return (
     <View className="mt-6 h-14 w-full flex-row items-center rounded-[18px] bg-white px-4 shadow-sm shadow-slate-200">
       <View className="flex-1 flex flex-row items-center justify-start z-50">
-        <Image source={icons.search} className="size-5" />
+        <SearchIcon size={20} color="#667085" strokeWidth={2.2} />
         <TextInput
           value={search}
           onChangeText={handleSearch}
@@ -32,7 +32,7 @@ const Search = () => {
       </View>
 
       <TouchableOpacity className="size-10 items-center justify-center rounded-full bg-primary-300">
-        <Image source={icons.filter} className="size-5" tintColor="#FFFFFF" />
+        <SlidersHorizontal size={20} color="#FFFFFF" strokeWidth={2.2} />
       </TouchableOpacity>
     </View>
   );

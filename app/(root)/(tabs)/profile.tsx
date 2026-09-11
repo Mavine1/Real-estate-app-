@@ -2,7 +2,6 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  ImageSourcePropType,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -12,16 +11,24 @@ import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  Bell,
+  CalendarDays,
+  ChevronRight,
+  LogOut,
+  Pencil,
+  WalletCards,
+  type LucideIcon,
+} from "lucide-react-native";
 
 import { logout, updateUserAvatar } from "@/lib/appwrite";
 import { useGlobalContext } from "@/lib/global-provider";
 
-import icons from "@/constants/icons";
 import images from "@/constants/images";
 import { settings } from "@/constants/data";
 
 interface SettingsItemProp {
-  icon: ImageSourcePropType;
+  icon: LucideIcon;
   title: string;
   onPress?: () => void;
   textStyle?: string;
@@ -29,7 +36,7 @@ interface SettingsItemProp {
 }
 
 const SettingsItem = ({
-  icon,
+  icon: Icon,
   title,
   onPress,
   textStyle,
@@ -40,13 +47,15 @@ const SettingsItem = ({
     className="flex flex-row items-center justify-between py-3"
   >
     <View className="flex flex-row items-center gap-3">
-      <Image source={icon} className="size-6" />
+      <View className="size-10 items-center justify-center rounded-2xl bg-primary-100">
+        <Icon size={21} color={textStyle?.includes("danger") ? "#D94841" : "#2F6BFF"} strokeWidth={2.1} />
+      </View>
       <Text className={`text-lg font-rubik-medium text-black-300 ${textStyle}`}>
         {title}
       </Text>
     </View>
 
-    {showArrow && <Image source={icons.rightArrow} className="size-5" />}
+    {showArrow && <ChevronRight size={20} color="#98A2B3" strokeWidth={2.1} />}
   </TouchableOpacity>
 );
 
@@ -137,7 +146,9 @@ const Profile = () => {
       >
         <View className="flex flex-row items-center justify-between mt-5">
           <Text className="text-xl font-rubik-bold">Profile</Text>
-          <Image source={icons.bell} className="size-5" />
+          <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-primary-100" accessibilityLabel="Notifications">
+            <Bell size={21} color="#17213C" strokeWidth={2.1} />
+          </TouchableOpacity>
         </View>
 
         <View className="flex flex-row justify-center mt-5">
@@ -162,7 +173,9 @@ const Profile = () => {
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 </View>
               ) : (
-                <Image source={icons.edit} className="size-9" />
+                <View className="size-10 items-center justify-center rounded-full border-2 border-white bg-primary-300">
+                  <Pencil size={18} color="#FFFFFF" strokeWidth={2.2} />
+                </View>
               )}
             </TouchableOpacity>
 
@@ -177,12 +190,12 @@ const Profile = () => {
           {user?.role === "tenant" && (
             <>
               <SettingsItem
-                icon={icons.calendar}
+                icon={CalendarDays}
                 title="Lease & documents"
                 onPress={() => router.push("/(root)/(tabs)/documents")}
               />
               <SettingsItem
-                icon={icons.wallet}
+                icon={WalletCards}
                 title="Payments & receipts"
                 onPress={() => router.push("/(root)/(tabs)/payments")}
               />
@@ -198,7 +211,7 @@ const Profile = () => {
 
         <View className="flex flex-col border-t mt-5 pt-5 border-primary-200">
           <SettingsItem
-            icon={icons.logout}
+            icon={LogOut}
             title="Logout"
             textStyle="text-danger"
             showArrow={false}

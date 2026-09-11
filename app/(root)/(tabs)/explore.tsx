@@ -1,7 +1,6 @@
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Text,
   TouchableOpacity,
   View,
@@ -9,8 +8,8 @@ import {
 import { useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ArrowLeft, Bell } from "lucide-react-native";
 
-import icons from "@/constants/icons";
 import Search from "@/components/Search";
 import { Card } from "@/components/Cards";
 import Filters from "@/components/Filters";
@@ -70,13 +69,15 @@ const Explore = () => {
                 onPress={() => router.back()}
                 className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center"
               >
-                <Image source={icons.backArrow} className="size-5" />
+                <ArrowLeft size={20} color="#17213C" strokeWidth={2.2} />
               </TouchableOpacity>
 
               <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
                 Search for Your Ideal Home
               </Text>
-              <Image source={icons.bell} className="w-6 h-6" />
+              <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white" accessibilityLabel="Notifications">
+                <Bell size={21} color="#17213C" strokeWidth={2.1} />
+              </TouchableOpacity>
             </View>
 
             <Search />
