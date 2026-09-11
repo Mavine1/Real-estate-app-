@@ -124,7 +124,7 @@ export default function Login() {
         </TouchableOpacity>
 
         <View className="mt-8 flex-row justify-center">
-          <Text className="font-rubik text-black-100">New to Baraka Homes? </Text>
+          <Text className="font-rubik text-black-100">New to Barak Home? </Text>
           <TouchableOpacity onPress={() => router.replace("/sign-up")}>
             <Text className="font-rubik-bold text-primary-300">Sign up</Text>
           </TouchableOpacity>

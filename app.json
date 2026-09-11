@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Baraka Homes",
+    "name": "Barak Home",
     "slug": "baraka-homes",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -28,7 +28,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow Baraka Homes to choose your profile photo.",
+          "photosPermission": "Allow Barak Home to choose your profile photo.",
           "microphonePermission": false
         }
       ],

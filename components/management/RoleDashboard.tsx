@@ -7,9 +7,10 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react-native";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import images from "@/constants/images";
 import { agentOverview, ownerOverview } from "@/constants/rental";
 import { formatPrice } from "@/lib/format";
 import { useGlobalContext } from "@/lib/global-provider";
@@ -30,7 +31,16 @@ export default function RoleDashboard() {
     <SafeAreaView className="flex-1 bg-accent-100">
       <ScrollView contentContainerClassName="px-5 pb-32" showsVerticalScrollIndicator={false}>
         <View className="mt-4 flex-row items-center justify-between">
-          <View><Text className="text-xs font-rubik text-black-100">{owner ? "Owner overview" : "Operations overview"}</Text><Text className="text-2xl font-rubik-bold text-black-300">Good morning, {name}</Text></View>
+          <View className="flex-row items-center">
+            <View className="size-12 items-center justify-center rounded-2xl bg-white shadow-sm">
+              <Image source={images.logoMark} resizeMode="contain" className="size-10" />
+            </View>
+            <View className="ml-3">
+              <Text className="text-xs font-rubik-semibold uppercase tracking-wider text-primary-300">Barak Home</Text>
+              <Text className="text-lg font-rubik-bold text-black-300">Hi, {name}</Text>
+              <Text className="text-[11px] font-rubik text-black-100">{owner ? "Owner portal" : "Agent portal"}</Text>
+            </View>
+          </View>
           <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white"><Bell size={22} color="#17213C" /></TouchableOpacity>
         </View>
 

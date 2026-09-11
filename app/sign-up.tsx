@@ -69,7 +69,7 @@ export default function SignUp() {
 
         <Text className="text-3xl font-rubik-extrabold text-black-300">Create your account</Text>
         <Text className="mt-2 text-base font-rubik text-black-100">
-          Start your home search with Baraka Homes.
+          Start your home search with Barak Home.
         </Text>
 
         <TextInput

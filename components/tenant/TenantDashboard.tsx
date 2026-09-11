@@ -67,16 +67,21 @@ export default function TenantDashboard() {
         <View className="px-5 pt-4">
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
-              <Image source={user?.avatar ? { uri: user.avatar } : images.defaultProfileAvatar} className="size-12 rounded-full border-2 border-white" />
+              <View className="size-12 items-center justify-center rounded-2xl bg-white shadow-sm">
+                <Image source={images.logoMark} resizeMode="contain" className="size-10" />
+              </View>
               <View className="ml-3">
-                <Text className="text-xs font-rubik text-black-100">Welcome home</Text>
+                <Text className="text-xs font-rubik-semibold uppercase tracking-wider text-primary-300">Barak Home</Text>
                 <Text className="text-lg font-rubik-bold text-black-300">Hi, {firstName}</Text>
               </View>
             </View>
-            <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white">
-              <Bell size={22} color="#17213C" />
-              <View className="absolute right-2.5 top-2.5 size-2 rounded-full bg-[#FF6B35]" />
-            </TouchableOpacity>
+            <View className="flex-row items-center">
+              <Image source={user?.avatar ? { uri: user.avatar } : images.defaultProfileAvatar} className="mr-2 size-11 rounded-full border-2 border-white" />
+              <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white">
+                <Bell size={22} color="#17213C" />
+                <View className="absolute right-2.5 top-2.5 size-2 rounded-full bg-[#FF6B35]" />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <ImageBackground
