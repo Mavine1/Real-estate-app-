@@ -9,14 +9,24 @@ import {
   type LucideIcon,
 } from "lucide-react-native";
 import { Tabs } from "expo-router";
-import type { ColorValue } from "react-native";
+import { View, type ColorValue } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useGlobalContext } from "@/lib/global-provider";
 
 const icon = (Icon: LucideIcon) =>
   function NavigationIcon({ focused, color }: { focused: boolean; color: ColorValue }) {
-    return <Icon size={23} color={color as string} strokeWidth={focused ? 2.8 : 2} />;
+    return (
+      <View
+        className={`h-9 w-11 items-center justify-center rounded-2xl ${focused ? "bg-primary-100" : "bg-transparent"}`}
+      >
+        <Icon
+          size={22}
+          color={color as string}
+          strokeWidth={focused ? 2.6 : 2.1}
+        />
+      </View>
+    );
   };
 
 const HomeIcon = icon(Home);
@@ -46,7 +56,7 @@ export default function TabsLayout() {
           fontSize: 10,
           marginTop: 2,
         },
-        tabBarIconStyle: { marginTop: 5 },
+        tabBarIconStyle: { marginTop: 3 },
         tabBarItemStyle: { paddingHorizontal: 0 },
         tabBarStyle: {
           backgroundColor: "#FFFFFF",
