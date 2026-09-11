@@ -62,8 +62,9 @@ export default function SignUp() {
 
   return (
     <AuthScreenLayout>
-        <TouchableOpacity onPress={() => router.back()} className="mb-8 self-start">
-          <Text className="text-base font-rubik-semibold text-primary-300">‹ Back</Text>
+        <TouchableOpacity onPress={() => router.back()} className="mb-8 flex-row items-center self-start">
+          <Ionicons name="chevron-back" size={19} color="#2F6BFF" />
+          <Text className="font-rubik-semibold text-primary-300">Back</Text>
         </TouchableOpacity>
 
         <Text className="text-3xl font-rubik-extrabold text-black-300">Create your account</Text>

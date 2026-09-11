@@ -3,7 +3,6 @@ import {
   Alert,
   Image,
   ImageSourcePropType,
-  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -11,6 +10,8 @@ import {
 } from "react-native";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { logout, updateUserAvatar } from "@/lib/appwrite";
 import { useGlobalContext } from "@/lib/global-provider";
@@ -173,8 +174,20 @@ const Profile = () => {
         </View>
 
         <View className="flex flex-col mt-10">
-          <SettingsItem icon={icons.calendar} title="My Bookings" />
-          <SettingsItem icon={icons.wallet} title="Payments" />
+          {user?.role === "tenant" && (
+            <>
+              <SettingsItem
+                icon={icons.calendar}
+                title="Lease & documents"
+                onPress={() => router.push("/(root)/(tabs)/documents")}
+              />
+              <SettingsItem
+                icon={icons.wallet}
+                title="Payments & receipts"
+                onPress={() => router.push("/(root)/(tabs)/payments")}
+              />
+            </>
+          )}
         </View>
 
         <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
