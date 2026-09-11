@@ -1,8 +1,6 @@
 import { useState } from "react";
 import {
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -10,8 +8,8 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import AuthScreenLayout from "@/components/AuthScreenLayout";
 import { loginWithGoogle, signUpWithEmail } from "@/lib/appwrite";
 import { useGlobalContext } from "@/lib/global-provider";
 
@@ -54,11 +52,7 @@ export default function SignUp() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-accent-100">
-      <KeyboardAvoidingView
-        className="flex-1 justify-center px-6"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
+    <AuthScreenLayout>
         <TouchableOpacity onPress={() => router.back()} className="mb-8 self-start">
           <Text className="text-base font-rubik-semibold text-primary-300">‹ Back</Text>
         </TouchableOpacity>
@@ -141,7 +135,6 @@ export default function SignUp() {
             <Text className="font-rubik-bold text-primary-300">Log in</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+    </AuthScreenLayout>
   );
 }

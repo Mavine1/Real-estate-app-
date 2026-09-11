@@ -9,6 +9,7 @@ import map from "@/assets/images/map.png";
 import noResult from "@/assets/images/no-result.png";
 import logoMark from "@/assets/images/baraka-logo-mark-v2.png";
 import logoWordmark from "@/assets/images/baraka-logo-wordmark.png";
+import authNairobi from "@/assets/images/auth-nairobi-residence.png";
 
 export default {
   onboardingBaraka,
@@ -22,4 +23,5 @@ export default {
   noResult,
   logoMark,
   logoWordmark,
+  authNairobi,
 };
