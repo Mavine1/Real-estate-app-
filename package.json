@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --port 8081",
+    "start": "expo start --go --port 8081",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android --port 8081",
     "ios": "expo run:ios --port 8081",
