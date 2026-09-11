@@ -123,7 +123,7 @@ Replace the values with your actual Appwrite credentials. You can obtain these c
 
 ### Seed role-based demo accounts
 
-Create an Appwrite API key with `users.read` and `users.write`, add it to your
+Create an Appwrite API key with `users.write`, add it to your
 local `.env` as `APPWRITE_API_KEY`, and run:
 
 ```bash

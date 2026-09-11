@@ -84,7 +84,7 @@ async function seedUser(user) {
     await request(`${userPath}/name`, "PATCH", { name: user.name });
   }
 
-  await request(`/users/${encodeURIComponent(user.userId)}/labels`, "PATCH", {
+  await request(`/users/${encodeURIComponent(user.userId)}/labels`, "PUT", {
     labels: [user.role],
   });
   await request(`/users/${encodeURIComponent(user.userId)}/prefs`, "PATCH", {
