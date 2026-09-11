@@ -44,11 +44,15 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
 
+export const USER_ROLES = ["tenant", "agent", "owner"] as const;
+export type UserRole = (typeof USER_ROLES)[number];
+
 export type AppUser = {
   $id: string;
   name: string;
   email: string;
   avatar: string;
+  role: UserRole;
 };
 
 const withTimeout = async <T>(request: Promise<T>, timeoutMs = 12_000) => {
@@ -69,11 +73,22 @@ const withTimeout = async <T>(request: Promise<T>, timeoutMs = 12_000) => {
   }
 };
 
-const toAppUser = (user: { $id: string; name: string; email: string }): AppUser => ({
+const getUserRole = (prefs?: Record<string, unknown>): UserRole => {
+  const role = prefs?.role;
+  return USER_ROLES.includes(role as UserRole) ? (role as UserRole) : "tenant";
+};
+
+const toAppUser = (user: {
+  $id: string;
+  name: string;
+  email: string;
+  prefs?: Record<string, unknown>;
+}): AppUser => ({
   $id: user.$id,
   name: user.name,
   email: user.email,
   avatar: avatar.getInitials(user.name).toString(),
+  role: getUserRole(user.prefs),
 });
 
 const syncUserProfile = async (user: AppUser, provider: "google" | "email") => {
@@ -108,10 +123,16 @@ const syncUserProfile = async (user: AppUser, provider: "google" | "email") => {
 };
 
 const finishAuthenticatedUser = async (provider: "google" | "email") => {
-  const user = toAppUser(await withTimeout(account.get()));
+  const accountUser = await withTimeout(account.get());
+  const user = toAppUser(accountUser);
   await withTimeout(
     account.updatePrefs({
-      prefs: { provider, avatar: user.avatar },
+      prefs: {
+        ...accountUser.prefs,
+        provider,
+        avatar: user.avatar,
+        role: user.role,
+      },
     })
   );
 
