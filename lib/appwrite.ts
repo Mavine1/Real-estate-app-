@@ -73,6 +73,35 @@ const withTimeout = async <T>(request: Promise<T>, timeoutMs = 12_000) => {
   }
 };
 
+const getErrorDetails = (error: unknown) =>
+  typeof error === "object" && error
+    ? (error as { code?: number; type?: string; message?: string })
+    : {};
+
+export const getAuthenticationErrorMessage = (error: unknown) => {
+  const { code, type, message } = getErrorDetails(error);
+
+  if (code === 401 || type?.includes("invalid_credentials"))
+    return "Incorrect email or password.";
+  if (code === 429)
+    return "Too many sign-in attempts. Please wait a moment and try again.";
+  if (message?.toLowerCase().includes("timed out")) return message;
+  if (message?.toLowerCase().includes("network"))
+    return "Unable to reach Appwrite. Check your internet connection and try again.";
+
+  return message || "Authentication could not be completed. Please try again.";
+};
+
+const clearCurrentSession = async () => {
+  try {
+    await withTimeout(account.deleteSession("current"));
+    console.log("[Auth] Previous session cleared before switching sign-in method");
+  } catch (error) {
+    const { code } = getErrorDetails(error);
+    if (code !== 401) throw error;
+  }
+};
+
 const getUserRole = (
   labels?: string[],
   provider?: unknown
@@ -162,6 +191,8 @@ const finishAuthenticatedUser = async (provider: "google" | "email") => {
 
 export async function loginWithGoogle(): Promise<AppUser | null> {
   try {
+    await clearCurrentSession();
+
     // Expo Router creates the active Expo Go callback URL, including the
     // current Metro host and port (for example, exp://192.168.1.68:8081).
     const redirectUri = Linking.createURL("/");
@@ -198,18 +229,19 @@ export async function loginWithGoogle(): Promise<AppUser | null> {
     return await finishAuthenticatedUser("google");
   } catch (error) {
     console.error("[Auth] Google sign-in failed:", error);
-    return null;
+    throw error;
   }
 }
 
 export async function loginWithEmail(email: string, password: string): Promise<AppUser | null> {
   try {
+    await clearCurrentSession();
     await withTimeout(account.createEmailPasswordSession({ email, password }));
     console.log("[Auth] Email session created");
     return await finishAuthenticatedUser("email");
   } catch (error) {
     console.error("[Auth] Email login failed:", error);
-    return null;
+    throw error;
   }
 }
 
@@ -219,6 +251,7 @@ export async function signUpWithEmail(
   password: string
 ): Promise<AppUser | null> {
   try {
+    await clearCurrentSession();
     await withTimeout(
       account.create({ userId: ID.unique(), name: name.trim(), email, password })
     );
@@ -227,7 +260,7 @@ export async function signUpWithEmail(
     return await finishAuthenticatedUser("email");
   } catch (error) {
     console.error("[Auth] Email sign-up failed:", error);
-    return null;
+    throw error;
   }
 }
 
