@@ -20,6 +20,7 @@ import { router } from "expo-router";
 import {
   Image,
   ImageBackground,
+  type ImageSourcePropType,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -40,21 +41,28 @@ const QuickAction = ({
   icon,
   label,
   color,
+  image,
   onPress,
 }: {
   icon: LucideIcon;
   label: string;
   color: string;
+  image: ImageSourcePropType;
   onPress: () => void;
 }) => {
   const Icon = icon;
 
   return (
-  <TouchableOpacity onPress={onPress} className="mr-3 w-[104px] rounded-[22px] bg-white p-4">
-    <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: `${color}18` }}>
-      <Icon size={21} color={color} />
+  <TouchableOpacity onPress={onPress} activeOpacity={0.88} className="mr-3 w-[132px] overflow-hidden rounded-[22px] bg-white">
+    <ImageBackground source={image} resizeMode="cover" className="h-20 w-full">
+      <View className="absolute inset-0 bg-[#102A55]/15" />
+      <View className="absolute bottom-2 left-2 size-9 items-center justify-center rounded-xl bg-white/95">
+        <Icon size={19} color={color} strokeWidth={2.2} />
+      </View>
+    </ImageBackground>
+    <View className="min-h-[52px] justify-center px-3 py-2.5">
+      <Text numberOfLines={2} className="text-sm font-rubik-semibold text-black-300">{label}</Text>
     </View>
-    <Text className="mt-3 text-sm font-rubik-semibold text-black-300">{label}</Text>
   </TouchableOpacity>
   );
 };
@@ -166,10 +174,10 @@ export default function TenantDashboard() {
           <Text className="mb-3 mt-7 text-lg font-rubik-bold text-black-300">Quick actions</Text>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="pl-5 pr-2">
-          <QuickAction icon={Wallet} label="Payments" color="#2F6BFF" onPress={() => router.push("/(root)/(tabs)/payments")} />
-          <QuickAction icon={Wrench} label="Report issue" color="#E66B2E" onPress={() => router.push("/(root)/(tabs)/maintenance")} />
-          <QuickAction icon={FileText} label="Documents" color="#7A5AF8" onPress={() => router.push("/(root)/(tabs)/documents")} />
-          <QuickAction icon={MessageCircle} label="Contact agent" color="#159B6C" onPress={() => router.push("/(root)/(tabs)/maintenance")} />
+          <QuickAction icon={Wallet} label="Payments" color="#2F6BFF" image={images.quickActionPayment} onPress={() => router.push("/(root)/(tabs)/payments")} />
+          <QuickAction icon={Wrench} label="Report issue" color="#E66B2E" image={images.quickActionMaintenance} onPress={() => router.push("/(root)/(tabs)/maintenance")} />
+          <QuickAction icon={FileText} label="Documents" color="#7A5AF8" image={images.quickActionDocuments} onPress={() => router.push("/(root)/(tabs)/documents")} />
+          <QuickAction icon={MessageCircle} label="Contact agent" color="#159B6C" image={images.quickActionAgent} onPress={() => router.push("/(root)/(tabs)/maintenance")} />
         </ScrollView>
 
         <View className="px-5">

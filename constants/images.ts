@@ -12,6 +12,10 @@ import logoWordmark from "@/assets/images/baraka-logo-wordmark.png";
 import authNairobi from "@/assets/images/auth-nairobi-residence.png";
 import defaultProfileAvatar from "@/assets/images/default-profile-avatar-head.png";
 import tenantApartmentHome from "@/assets/images/tenant-apartment-home.jpg";
+import quickActionPayment from "@/assets/images/quick-action-1.jpg";
+import quickActionMaintenance from "@/assets/images/quick-action-2.jpg";
+import quickActionDocuments from "@/assets/images/quick-action-3.jpg";
+import quickActionAgent from "@/assets/images/quick-action-4.jpg";
 
 export default {
   onboardingBaraka,
@@ -28,4 +32,8 @@ export default {
   authNairobi,
   defaultProfileAvatar,
   tenantApartmentHome,
+  quickActionPayment,
+  quickActionMaintenance,
+  quickActionDocuments,
+  quickActionAgent,
 };
