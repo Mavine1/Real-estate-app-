@@ -4,7 +4,7 @@
     "slug": "baraka-homes",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/favicon.png",
+    "icon": "./assets/images/baraka-app-icon.png",
     "scheme": "barakahomes",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -14,24 +14,24 @@
     "android": {
       "package": "com.barakahomes.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/favicon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/baraka-logo-mark-v2.png",
+        "backgroundColor": "#F4F7FF"
       }
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/baraka-app-icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "resizeMode": "cover",
-          "backgroundColor": "#ffffff",
-          "enableFullScreenImage_legacy": true
+          "image": "./assets/images/baraka-logo-mark-v2.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#F4F7FF"
         }
       ],
       [

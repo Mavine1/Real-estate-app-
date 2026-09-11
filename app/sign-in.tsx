@@ -45,9 +45,11 @@ const Auth = () => {
 
       <SafeAreaView className="flex-1 px-7 pb-8">
         <View className="pt-8">
-          <Text className="text-xs font-rubik-bold tracking-[3px] text-white/80 uppercase">
-            Baraka Homes
-          </Text>
+          <Image
+            source={images.logoWordmark}
+            resizeMode="contain"
+            className="h-14 w-56"
+          />
           <Text className="mt-3 text-[42px] leading-[43px] font-rubik-extrabold text-white">
             Explore New{"\n"}Perspectives.
           </Text>
