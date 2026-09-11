@@ -73,7 +73,12 @@ const withTimeout = async <T>(request: Promise<T>, timeoutMs = 12_000) => {
   }
 };
 
-const getUserRole = (labels?: string[]): UserRole => {
+const getUserRole = (
+  labels?: string[],
+  provider?: unknown
+): UserRole => {
+  if (provider === "google") return "tenant";
+
   const role = labels?.find((label) => USER_ROLES.includes(label as UserRole));
   return role ? (role as UserRole) : "tenant";
 };
@@ -83,12 +88,13 @@ const toAppUser = (user: {
   name: string;
   email: string;
   labels?: string[];
+  prefs?: Record<string, unknown>;
 }): AppUser => ({
   $id: user.$id,
   name: user.name,
   email: user.email,
   avatar: avatar.getInitials(user.name).toString(),
-  role: getUserRole(user.labels),
+  role: getUserRole(user.labels, user.prefs?.provider),
 });
 
 const syncUserProfile = async (user: AppUser, provider: "google" | "email") => {
@@ -124,7 +130,12 @@ const syncUserProfile = async (user: AppUser, provider: "google" | "email") => {
 
 const finishAuthenticatedUser = async (provider: "google" | "email") => {
   const accountUser = await withTimeout(account.get());
-  const user = toAppUser(accountUser);
+  // Social sign-in is the client entry point. Privileged Agent and Owner
+  // roles are only honored for the seeded email/password accounts.
+  const user = toAppUser({
+    ...accountUser,
+    prefs: { ...accountUser.prefs, provider },
+  });
   await withTimeout(
     account.updatePrefs({
       prefs: {
