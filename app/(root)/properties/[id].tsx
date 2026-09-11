@@ -48,14 +48,14 @@ const PropertyDetails = () => {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-accent-100">
+      <View className="flex-1 items-center justify-center bg-transparent">
         <ActivityIndicator size="large" color="#2F6BFF" />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-accent-100">
+    <View className="flex-1 bg-transparent">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerClassName="pb-32"

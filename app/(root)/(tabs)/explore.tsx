@@ -46,7 +46,7 @@ const Explore = () => {
   const handleCardPress = (id: string) => router.push(`/properties/${id}`);
 
   return (
-    <SafeAreaView className="h-full bg-accent-100">
+    <SafeAreaView className="h-full bg-transparent">
       <FlatList
         data={properties}
         renderItem={({ item }) => (

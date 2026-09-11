@@ -88,7 +88,7 @@ export default function TenantDashboard() {
   const GreetingIcon = hour >= 17 ? Moon : Sun;
 
   return (
-    <SafeAreaView className="flex-1 bg-accent-100">
+    <SafeAreaView className="flex-1 bg-transparent">
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-32">
         <View className="px-5 pt-4">
           <View className="flex-row items-center justify-between">

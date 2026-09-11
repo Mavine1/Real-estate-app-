@@ -29,7 +29,7 @@ export default function Management() {
   const owner = user?.role === "owner";
 
   return (
-    <SafeAreaView className="flex-1 bg-accent-100">
+    <SafeAreaView className="flex-1 bg-transparent">
       <ScrollView contentContainerClassName="px-5 pb-32" showsVerticalScrollIndicator={false}>
         <View className="mt-4 flex-row items-center justify-between"><View><Text className="text-2xl font-rubik-bold text-black-300">{owner ? "My properties" : "Tenants"}</Text><Text className="mt-1 text-sm font-rubik text-black-100">{owner ? "Portfolio performance and income" : "Tenant files, leases and balances"}</Text></View><TouchableOpacity className="size-12 items-center justify-center rounded-2xl bg-primary-300"><Plus size={26} color="#FFFFFF" /></TouchableOpacity></View>
         <View className="mt-6 h-13 flex-row items-center rounded-2xl bg-white px-4"><Search size={20} color="#98A2B3" /><TextInput placeholder={owner ? "Search properties" : "Search tenants, units or property"} placeholderTextColor="#98A2B3" className="ml-2 flex-1 font-rubik text-black-300" /></View>

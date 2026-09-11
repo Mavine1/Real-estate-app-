@@ -51,6 +51,7 @@ export default function TabsLayout() {
         tabBarActiveTintColor: "#2F6BFF",
         tabBarInactiveTintColor: "#7A8499",
         tabBarHideOnKeyboard: true,
+        sceneStyle: { backgroundColor: "transparent" },
         tabBarLabelStyle: {
           fontFamily: "Rubik-Medium",
           fontSize: 10,

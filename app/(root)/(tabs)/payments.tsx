@@ -34,7 +34,7 @@ export default function Payments() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-accent-100">
+    <SafeAreaView className="flex-1 bg-transparent">
       <ScrollView contentContainerClassName="px-5 pb-32" showsVerticalScrollIndicator={false}>
         <View className="mt-4"><Text className="text-2xl font-rubik-bold text-black-300">Payments</Text><Text className="mt-1 text-sm font-rubik text-black-100">Rent, receipts and account balance</Text></View>
         <View className="mt-6 rounded-[28px] bg-[#102A55] p-5">

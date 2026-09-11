@@ -33,7 +33,7 @@ export default function RoleDashboard() {
   const GreetingIcon = hour >= 17 ? Moon : Sun;
 
   return (
-    <SafeAreaView className="flex-1 bg-accent-100">
+    <SafeAreaView className="flex-1 bg-transparent">
       <ScrollView contentContainerClassName="px-5 pb-32" showsVerticalScrollIndicator={false}>
         <View className="mt-4 flex-row items-center justify-between">
           <View className="flex-row items-center">

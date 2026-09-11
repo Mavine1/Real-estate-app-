@@ -40,7 +40,7 @@ export default function Maintenance() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-accent-100">
+    <SafeAreaView className="flex-1 bg-transparent">
       <ScrollView contentContainerClassName="px-5 pb-32" showsVerticalScrollIndicator={false}>
         <View className="mt-4 flex-row items-center justify-between">
           <View><Text className="text-2xl font-rubik-bold text-black-300">Maintenance</Text><Text className="mt-1 text-sm font-rubik text-black-100">{tenant ? "Report and track issues" : owner ? "Review costs and approvals" : "Assign and manage work orders"}</Text></View>
