@@ -121,6 +121,27 @@ Replace the values with your actual Appwrite credentials. You can obtain these c
  npx expo start
 ```
 
+### Seed role-based demo accounts
+
+Create an Appwrite API key with `users.read` and `users.write`, add it to your
+local `.env` as `APPWRITE_API_KEY`, and run:
+
+```bash
+npm run seed:users
+```
+
+This creates or refreshes these development-only accounts:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Tenant | `tenant@barakahomes.test` | `Tenant@123` |
+| Agent | `agent@barakahomes.test` | `Agent@123` |
+| Owner | `owner@barakahomes.test` | `Owner@123` |
+
+Roles are stored as server-managed Appwrite user labels. New email and Google
+accounts default to the Tenant role. Replace these passwords before using the accounts
+outside local development.
+
 In the output, you'll find options to open the app in a
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)

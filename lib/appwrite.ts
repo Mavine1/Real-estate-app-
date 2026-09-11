@@ -73,22 +73,22 @@ const withTimeout = async <T>(request: Promise<T>, timeoutMs = 12_000) => {
   }
 };
 
-const getUserRole = (prefs?: Record<string, unknown>): UserRole => {
-  const role = prefs?.role;
-  return USER_ROLES.includes(role as UserRole) ? (role as UserRole) : "tenant";
+const getUserRole = (labels?: string[]): UserRole => {
+  const role = labels?.find((label) => USER_ROLES.includes(label as UserRole));
+  return role ? (role as UserRole) : "tenant";
 };
 
 const toAppUser = (user: {
   $id: string;
   name: string;
   email: string;
-  prefs?: Record<string, unknown>;
+  labels?: string[];
 }): AppUser => ({
   $id: user.$id,
   name: user.name,
   email: user.email,
   avatar: avatar.getInitials(user.name).toString(),
-  role: getUserRole(user.prefs),
+  role: getUserRole(user.labels),
 });
 
 const syncUserProfile = async (user: AppUser, provider: "google" | "email") => {
@@ -131,7 +131,6 @@ const finishAuthenticatedUser = async (provider: "google" | "email") => {
         ...accountUser.prefs,
         provider,
         avatar: user.avatar,
-        role: user.role,
       },
     })
   );

@@ -81,6 +81,9 @@ const Profile = () => {
             </TouchableOpacity>
 
             <Text className="text-2xl font-rubik-bold mt-2">{user?.name}</Text>
+            <Text className="mt-1 font-rubik-medium capitalize text-primary-300">
+              {user?.role}
+            </Text>
           </View>
         </View>
 
