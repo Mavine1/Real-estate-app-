@@ -1,6 +1,5 @@
 import { View, Text, Image } from "react-native";
 
-import images from "@/constants/images";
 import icons from "@/constants/icons";
 import { Models } from "react-native-appwrite";
 

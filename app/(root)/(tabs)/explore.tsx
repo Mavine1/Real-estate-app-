@@ -40,6 +40,8 @@ const Explore = () => {
       filter: params.filter!,
       query: params.query!,
     });
+    // `refetch` intentionally tracks the current route parameters here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.filter, params.query]);
 
   const handleCardPress = (id: string) => router.push(`/properties/${id}`);

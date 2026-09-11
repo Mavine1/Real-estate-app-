@@ -107,7 +107,7 @@ const Auth = () => {
           </TouchableOpacity>
 
           <Text className="mt-5 text-center text-[11px] leading-4 font-rubik text-white/60">
-            By continuing, you agree to Baraka Homes' Terms and Privacy Policy.
+            {"By continuing, you agree to Baraka Homes' Terms and Privacy Policy."}
           </Text>
         </View>
       </SafeAreaView>

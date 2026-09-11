@@ -1,10 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Animated, Text, View } from "react-native";
 
 import images from "@/constants/images";
 
 export default function BrandLoader() {
-  const pulse = useRef(new Animated.Value(0)).current;
+  const [pulse] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     const animation = Animated.loop(
