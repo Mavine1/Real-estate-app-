@@ -1,9 +1,11 @@
 import { ReactNode } from "react";
 import {
+  Image,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Text,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -29,6 +31,15 @@ export default function AuthScreenLayout({ children }: { children: ReactNode }) 
             contentContainerClassName="flex-grow justify-center px-6 py-8"
           >
             <View className="rounded-[30px] border border-white/60 bg-white/95 px-6 py-7 shadow-lg">
+              <View className="mb-6 flex-row items-center justify-center">
+                <Image source={images.logoMark} resizeMode="contain" className="size-12" />
+                <View className="ml-2">
+                  <Text className="text-xl font-rubik-extrabold text-black-300">Barak Home</Text>
+                  <Text className="text-[10px] font-rubik-medium uppercase tracking-widest text-primary-300">
+                    Your home, managed
+                  </Text>
+                </View>
+              </View>
               {children}
             </View>
           </ScrollView>

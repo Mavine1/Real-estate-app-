@@ -47,11 +47,10 @@ const Auth = () => {
 
       <SafeAreaView className="flex-1 px-7 pb-8">
         <View className="pt-8">
-          <Image
-            source={images.logoWordmark}
-            resizeMode="contain"
-            className="h-14 w-56"
-          />
+          <View className="self-start flex-row items-center rounded-2xl bg-white/95 px-3 py-2">
+            <Image source={images.logoMark} resizeMode="contain" className="size-10" />
+            <Text className="ml-2 text-xl font-rubik-extrabold text-black-300">Barak Home</Text>
+          </View>
           <Text className="mt-3 text-[42px] leading-[43px] font-rubik-extrabold text-white">
             Explore New{"\n"}Perspectives.
           </Text>
