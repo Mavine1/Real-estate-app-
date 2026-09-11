@@ -118,9 +118,6 @@ export default function TenantDashboard() {
                     <Text className="text-[25px] font-rubik-bold text-white">
                   {tenantHome.property}
                     </Text>
-                    <Text className="mt-0.5 text-xs font-rubik-medium text-white/75">
-                      {tenantHome.building}
-                    </Text>
                   </View>
                 </View>
 

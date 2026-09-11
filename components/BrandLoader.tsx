@@ -45,7 +45,7 @@ export default function BrandLoader() {
         style={{ opacity, transform: [{ scale }] }}
       />
       <Text className="mt-3 text-lg font-rubik-bold text-black-300">
-        Barak Home
+        Baraka Homes
       </Text>
       <Text className="mt-1 text-xs font-rubik text-black-100">
         Finding your place...

@@ -49,7 +49,7 @@ const Auth = () => {
         <View className="pt-8">
           <View className="self-start flex-row items-center rounded-2xl bg-white/95 px-3 py-2">
             <Image source={images.logoMark} resizeMode="contain" className="size-10" />
-            <Text className="ml-2 text-xl font-rubik-extrabold text-black-300">Barak Home</Text>
+            <Text className="ml-2 text-xl font-rubik-extrabold text-black-300">Baraka Homes</Text>
           </View>
           <Text className="mt-3 text-[42px] leading-[43px] font-rubik-extrabold text-white">
             Explore New{"\n"}Perspectives.
@@ -106,7 +106,7 @@ const Auth = () => {
           </TouchableOpacity>
 
           <Text className="mt-5 text-center text-[11px] leading-4 font-rubik text-white/60">
-            {"By continuing, you agree to Barak Home's Terms and Privacy Policy."}
+            {"By continuing, you agree to Baraka Homes' Terms and Privacy Policy."}
           </Text>
         </View>
       </SafeAreaView>

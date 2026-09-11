@@ -8,8 +8,7 @@ export type MaintenanceStatus =
   | "Closed";
 
 export const tenantHome = {
-  property: "Barak Home",
-  building: "The Curve Residence",
+  property: "Baraka Homes",
   unit: "A-204",
   floor: "2nd Floor",
   doorNumber: "A-204",

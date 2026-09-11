@@ -34,7 +34,7 @@ export default function AuthScreenLayout({ children }: { children: ReactNode }) 
               <View className="mb-6 flex-row items-center justify-center">
                 <Image source={images.logoMark} resizeMode="contain" className="size-12" />
                 <View className="ml-2">
-                  <Text className="text-xl font-rubik-extrabold text-black-300">Barak Home</Text>
+                  <Text className="text-xl font-rubik-extrabold text-black-300">Baraka Homes</Text>
                   <Text className="text-[10px] font-rubik-medium uppercase tracking-widest text-primary-300">
                     Your home, managed
                   </Text>
