@@ -1,4 +1,12 @@
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Bell,
+  Building2,
+  ChevronRight,
+  FileText,
+  Users,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react-native";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -23,7 +31,7 @@ export default function RoleDashboard() {
       <ScrollView contentContainerClassName="px-5 pb-32" showsVerticalScrollIndicator={false}>
         <View className="mt-4 flex-row items-center justify-between">
           <View><Text className="text-xs font-rubik text-black-100">{owner ? "Owner overview" : "Operations overview"}</Text><Text className="text-2xl font-rubik-bold text-black-300">Good morning, {name}</Text></View>
-          <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white"><Ionicons name="notifications-outline" size={22} color="#17213C" /></TouchableOpacity>
+          <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white"><Bell size={22} color="#17213C" /></TouchableOpacity>
         </View>
 
         {owner ? (
@@ -52,18 +60,21 @@ export default function RoleDashboard() {
               <Stat label="Occupancy" value={`${agentOverview.occupancy}%`} />
             </View>
             <Text className="mb-3 mt-5 text-lg font-rubik-bold text-black-300">Needs attention</Text>
-            {[{ icon: "people-outline", title: "Tenants overdue", value: "3", color: "#E66B2E" }, { icon: "construct-outline", title: "Open maintenance", value: `${agentOverview.openMaintenance}`, color: "#7A5AF8" }, { icon: "document-text-outline", title: "Leases expiring", value: "4", color: "#2F6BFF" }].map((item) => (
+            {([{ icon: Users, title: "Tenants overdue", value: "3", color: "#E66B2E" }, { icon: Wrench, title: "Open maintenance", value: `${agentOverview.openMaintenance}`, color: "#7A5AF8" }, { icon: FileText, title: "Leases expiring", value: "4", color: "#2F6BFF" }] as { icon: LucideIcon; title: string; value: string; color: string }[]).map((item) => {
+              const Icon = item.icon;
+              return (
               <TouchableOpacity key={item.title} className="mb-3 flex-row items-center rounded-[22px] bg-white p-4">
-                <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: `${item.color}18` }}><Ionicons name={item.icon as keyof typeof Ionicons.glyphMap} size={22} color={item.color} /></View>
-                <Text className="ml-3 flex-1 font-rubik-semibold text-black-300">{item.title}</Text><Text className="text-xl font-rubik-bold text-black-300">{item.value}</Text><Ionicons name="chevron-forward" size={18} color="#98A2B3" />
+                <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: `${item.color}18` }}><Icon size={22} color={item.color} /></View>
+                <Text className="ml-3 flex-1 font-rubik-semibold text-black-300">{item.title}</Text><Text className="text-xl font-rubik-bold text-black-300">{item.value}</Text><ChevronRight size={18} color="#98A2B3" />
               </TouchableOpacity>
-            ))}
+              );
+            })}
           </>
         )}
 
         <Text className="mb-3 mt-5 text-lg font-rubik-bold text-black-300">{owner ? "Property snapshot" : "Quick actions"}</Text>
         <View className="rounded-[24px] bg-white p-5">
-          <View className="flex-row items-center"><View className="size-12 items-center justify-center rounded-2xl bg-primary-100"><Ionicons name="business-outline" size={24} color="#2F6BFF" /></View><View className="ml-3 flex-1"><Text className="font-rubik-bold text-black-300">Sunrise Apartments</Text><Text className="mt-1 text-xs font-rubik text-black-100">48 units • 43 occupied • Kilimani</Text></View><Ionicons name="chevron-forward" size={20} color="#98A2B3" /></View>
+          <View className="flex-row items-center"><View className="size-12 items-center justify-center rounded-2xl bg-primary-100"><Building2 size={24} color="#2F6BFF" /></View><View className="ml-3 flex-1"><Text className="font-rubik-bold text-black-300">Sunrise Apartments</Text><Text className="mt-1 text-xs font-rubik text-black-100">48 units • 43 occupied • Kilimani</Text></View><ChevronRight size={20} color="#98A2B3" /></View>
           <View className="mt-5 h-2 overflow-hidden rounded-full bg-primary-100"><View className="h-full w-[90%] rounded-full bg-[#23C483]" /></View>
           <Text className="mt-2 text-right text-xs font-rubik-semibold text-[#159B6C]">89.6% occupied</Text>
         </View>
@@ -71,4 +82,3 @@ export default function RoleDashboard() {
     </SafeAreaView>
   );
 }
-

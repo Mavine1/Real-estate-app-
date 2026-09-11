@@ -1,25 +1,31 @@
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Building2,
+  Home,
+  Search,
+  UserRound,
+  Users,
+  Wallet,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react-native";
 import { Tabs } from "expo-router";
 import type { ColorValue } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useGlobalContext } from "@/lib/global-provider";
 
-const icon = (
-  outline: keyof typeof Ionicons.glyphMap,
-  filled: keyof typeof Ionicons.glyphMap
-) =>
+const icon = (Icon: LucideIcon) =>
   function NavigationIcon({ focused, color }: { focused: boolean; color: ColorValue }) {
-    return <Ionicons name={focused ? filled : outline} size={23} color={color} />;
+    return <Icon size={23} color={color as string} strokeWidth={focused ? 2.8 : 2} />;
   };
 
-const HomeIcon = icon("home-outline", "home");
-const SearchIcon = icon("search-outline", "search");
-const WalletIcon = icon("wallet-outline", "wallet");
-const RepairIcon = icon("construct-outline", "construct");
-const ProfileIcon = icon("person-outline", "person");
-const TenantIcon = icon("people-outline", "people");
-const PortfolioIcon = icon("business-outline", "business");
+const HomeIcon = icon(Home);
+const SearchIcon = icon(Search);
+const WalletIcon = icon(Wallet);
+const RepairIcon = icon(Wrench);
+const ProfileIcon = icon(UserRound);
+const TenantIcon = icon(Users);
+const PortfolioIcon = icon(Building2);
 
 export default function TabsLayout() {
   const { user } = useGlobalContext();

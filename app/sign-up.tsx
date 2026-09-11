@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { ChevronLeft, Eye, EyeOff } from "lucide-react-native";
 
 import AuthScreenLayout from "@/components/AuthScreenLayout";
 import {
@@ -63,7 +63,7 @@ export default function SignUp() {
   return (
     <AuthScreenLayout>
         <TouchableOpacity onPress={() => router.back()} className="mb-8 flex-row items-center self-start">
-          <Ionicons name="chevron-back" size={19} color="#2F6BFF" />
+          <ChevronLeft size={19} color="#2F6BFF" />
           <Text className="font-rubik-semibold text-primary-300">Back</Text>
         </TouchableOpacity>
 
@@ -107,11 +107,10 @@ export default function SignUp() {
             hitSlop={10}
             className="absolute right-4 top-0 h-14 items-center justify-center"
           >
-            <Ionicons
-              name={showPassword ? "eye-off-outline" : "eye-outline"}
+            {showPassword ? <EyeOff
               size={22}
               color="#667085"
-            />
+            /> : <Eye size={22} color="#667085" />}
           </TouchableOpacity>
         </View>
 
