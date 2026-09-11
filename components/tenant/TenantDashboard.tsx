@@ -1,6 +1,6 @@
 import {
   Bell,
-  Camera,
+  CircleCheck,
   Droplets,
   FileText,
   Home,
@@ -83,40 +83,57 @@ export default function TenantDashboard() {
             source={images.tenantApartmentHome}
             resizeMode="cover"
             imageStyle={{ borderRadius: 30 }}
-            className="mt-6 min-h-[230px] overflow-hidden rounded-[30px]"
+            className="mt-6 min-h-[248px] overflow-hidden rounded-[30px]"
           >
-            <View className="absolute inset-0 bg-[#071B42]/75" />
+            <View className="absolute inset-0 bg-[#071B42]/60" />
             <View className="flex-1 justify-between p-5">
               <View className="flex-row items-start justify-between">
                 <View className="self-start rounded-full bg-white/20 px-3 py-1.5">
-                  <Text className="text-[11px] font-rubik-semibold text-white">MY HOME</Text>
+                  <Text className="text-[10px] font-rubik-semibold tracking-wider text-white">
+                    MY RESIDENCE
+                  </Text>
                 </View>
-                <View className="size-12 items-center justify-center rounded-[18px] bg-white/20">
-                  <Home size={25} color="#FFFFFF" />
+                <View className="flex-row items-center rounded-full bg-[#19A974]/90 px-3 py-1.5">
+                  <CircleCheck size={14} color="#FFFFFF" />
+                  <Text className="ml-1.5 text-[10px] font-rubik-semibold text-white">
+                    ACTIVE LEASE
+                  </Text>
                 </View>
               </View>
 
-              <View>
-                <Text className="text-[28px] font-rubik-bold text-white">
+              <View className="rounded-[22px] bg-[#071B42]/65 p-4">
+                <View className="flex-row items-center">
+                  <View className="size-10 items-center justify-center rounded-2xl bg-white/15">
+                    <Home size={21} color="#FFFFFF" />
+                  </View>
+                  <View className="ml-3 flex-1">
+                    <Text className="text-[25px] font-rubik-bold text-white">
                   {tenantHome.property}
-                </Text>
-                <View className="mt-2 flex-row items-center">
-                  <MapPin size={15} color="#DCE6FA" />
-                  <Text className="ml-1 text-xs font-rubik text-[#DCE6FA]">
-                    {tenantHome.address}
-                  </Text>
+                    </Text>
+                    <Text className="mt-0.5 text-xs font-rubik-medium text-white/75">
+                      {tenantHome.building}
+                    </Text>
+                  </View>
                 </View>
-                <View className="mt-4 flex-row">
-                  <View className="mr-2 flex-row items-center rounded-full bg-white/20 px-3 py-2">
+
+                <View className="my-3 h-px bg-white/15" />
+                <View className="flex-row items-center">
+                  <View className="mr-4 flex-row items-center">
                     <Layers3 size={15} color="#FFFFFF" />
                     <Text className="ml-1.5 text-xs font-rubik-semibold text-white">
                       {tenantHome.floor}
                     </Text>
                   </View>
-                  <View className="flex-row items-center rounded-full bg-white/20 px-3 py-2">
+                  <View className="mr-4 flex-row items-center">
                     <KeyRound size={15} color="#FFFFFF" />
                     <Text className="ml-1.5 text-xs font-rubik-semibold text-white">
-                      Door {tenantHome.doorNumber}
+                      {tenantHome.doorNumber}
+                    </Text>
+                  </View>
+                  <View className="min-w-0 flex-1 flex-row items-center">
+                    <MapPin size={15} color="#FFFFFF" />
+                    <Text className="ml-1 min-w-0 flex-1 text-xs font-rubik text-white/80" numberOfLines={1}>
+                      {tenantHome.address}
                     </Text>
                   </View>
                 </View>
