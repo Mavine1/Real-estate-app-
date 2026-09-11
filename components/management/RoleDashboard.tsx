@@ -25,22 +25,12 @@ const Stat = ({ label, value, accent }: { label: string; value: string; accent?:
 export default function RoleDashboard() {
   const { user } = useGlobalContext();
   const owner = user?.role === "owner";
-  const name = user?.name?.split(" ")[0] || (owner ? "Owner" : "Agent");
 
   return (
     <SafeAreaView className="flex-1 bg-accent-100">
       <ScrollView contentContainerClassName="px-5 pb-32" showsVerticalScrollIndicator={false}>
         <View className="mt-4 flex-row items-center justify-between">
-          <View className="flex-row items-center">
-            <View className="size-12 items-center justify-center rounded-2xl bg-white shadow-sm">
-              <Image source={images.logoMark} resizeMode="contain" className="size-10" />
-            </View>
-            <View className="ml-3">
-              <Text className="text-xs font-rubik-semibold uppercase tracking-wider text-primary-300">Barak Home</Text>
-              <Text className="text-lg font-rubik-bold text-black-300">Hi, {name}</Text>
-              <Text className="text-[11px] font-rubik text-black-100">{owner ? "Owner portal" : "Agent portal"}</Text>
-            </View>
-          </View>
+          <Image source={user?.avatar ? { uri: user.avatar } : images.defaultProfileAvatar} className="size-12 rounded-full border-2 border-white" />
           <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white"><Bell size={22} color="#17213C" /></TouchableOpacity>
         </View>
 
