@@ -3,6 +3,8 @@ import {
   Building2,
   ChevronRight,
   FileText,
+  Moon,
+  Sun,
   Users,
   Wrench,
   type LucideIcon,
@@ -25,12 +27,25 @@ const Stat = ({ label, value, accent }: { label: string; value: string; accent?:
 export default function RoleDashboard() {
   const { user } = useGlobalContext();
   const owner = user?.role === "owner";
+  const firstName = user?.name?.trim().split(/\s+/)[0] || (owner ? "Owner" : "Agent");
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const GreetingIcon = hour >= 17 ? Moon : Sun;
 
   return (
     <SafeAreaView className="flex-1 bg-accent-100">
       <ScrollView contentContainerClassName="px-5 pb-32" showsVerticalScrollIndicator={false}>
         <View className="mt-4 flex-row items-center justify-between">
-          <Image source={user?.avatar ? { uri: user.avatar } : images.defaultProfileAvatar} className="size-12 rounded-full border-2 border-white" />
+          <View className="flex-row items-center">
+            <Image source={user?.avatar ? { uri: user.avatar } : images.defaultProfileAvatar} className="size-12 rounded-full border-2 border-white" />
+            <View className="ml-3">
+              <View className="flex-row items-center">
+                <GreetingIcon size={14} color="#E66B2E" />
+                <Text className="ml-1.5 text-xs font-rubik-medium text-black-100">{greeting}</Text>
+              </View>
+              <Text className="mt-0.5 text-lg font-rubik-bold text-black-300">Hi, {firstName}</Text>
+            </View>
+          </View>
           <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white"><Bell size={22} color="#17213C" /></TouchableOpacity>
         </View>
 

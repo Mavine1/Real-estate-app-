@@ -9,7 +9,9 @@ import {
   MapPin,
   Megaphone,
   MessageCircle,
+  Moon,
   Smartphone,
+  Sun,
   Wallet,
   Wrench,
   type LucideIcon,
@@ -59,13 +61,26 @@ const QuickAction = ({
 
 export default function TenantDashboard() {
   const { user } = useGlobalContext();
+  const firstName = user?.name?.trim().split(/\s+/)[0] || "Tenant";
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const GreetingIcon = hour >= 17 ? Moon : Sun;
 
   return (
     <SafeAreaView className="flex-1 bg-accent-100">
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-32">
         <View className="px-5 pt-4">
           <View className="flex-row items-center justify-between">
-            <Image source={user?.avatar ? { uri: user.avatar } : images.defaultProfileAvatar} className="size-12 rounded-full border-2 border-white" />
+            <View className="flex-row items-center">
+              <Image source={user?.avatar ? { uri: user.avatar } : images.defaultProfileAvatar} className="size-12 rounded-full border-2 border-white" />
+              <View className="ml-3">
+                <View className="flex-row items-center">
+                  <GreetingIcon size={14} color="#E66B2E" />
+                  <Text className="ml-1.5 text-xs font-rubik-medium text-black-100">{greeting}</Text>
+                </View>
+                <Text className="mt-0.5 text-lg font-rubik-bold text-black-300">Hi, {firstName}</Text>
+              </View>
+            </View>
             <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white">
               <Bell size={22} color="#17213C" />
               <View className="absolute right-2.5 top-2.5 size-2 rounded-full bg-[#FF6B35]" />
