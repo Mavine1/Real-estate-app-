@@ -1,4 +1,4 @@
-import { CalendarDays, Check, Download, Eye, FileText, ShieldCheck, Smartphone, Wallet, X } from "lucide-react-native";
+import { CalendarDays, Check, CircleDollarSign, Download, Droplets, Eye, FileText, ShieldCheck, Smartphone, Sparkles, Trash2, Wallet, X } from "lucide-react-native";
 import { File, Paths } from "expo-file-system";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
@@ -24,6 +24,13 @@ import { useGlobalContext } from "@/lib/global-provider";
 const escapeHtml = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+const currentCharges = [
+  { id: "water", label: "Water bill", detail: "September usage", amount: 850, icon: Droplets, color: "#2F6BFF", background: "#EAF1FF" },
+  { id: "garbage", label: "Garbage collection", detail: "Monthly collection", amount: 300, icon: Trash2, color: "#159B6C", background: "#EAFBF4" },
+  { id: "service", label: "Service charge", detail: "Shared areas & security", amount: 1200, icon: Sparkles, color: "#8B5CF6", background: "#F2ECFF" },
+  { id: "other", label: "Other charges", detail: "No extra charges", amount: 0, icon: CircleDollarSign, color: "#667085", background: "#F2F4F7" },
+];
+
 export default function Payments() {
   const { user } = useGlobalContext();
   const [showPay, setShowPay] = useState(false);
@@ -31,6 +38,7 @@ export default function Payments() {
   const [downloadingStatement, setDownloadingStatement] = useState(false);
   const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState(String(tenantHome.balance));
+  const [paymentLabel, setPaymentLabel] = useState("Rent");
   const [submitting, setSubmitting] = useState(false);
   const paidTotal = useMemo(() => tenantPayments.reduce((sum, item) => sum + item.amount, 0), []);
   const paymentChart = useMemo(
@@ -45,6 +53,13 @@ export default function Payments() {
     []
   );
   const maxChartAmount = Math.max(...paymentChart.map((item) => item.amount));
+  const chargesTotal = currentCharges.reduce((sum, charge) => sum + charge.amount, 0);
+
+  const openPayment = (label: string, paymentAmount: number) => {
+    setPaymentLabel(label);
+    setAmount(String(paymentAmount));
+    setShowPay(true);
+  };
 
   const downloadStatement = async () => {
     setDownloadingStatement(true);
@@ -156,7 +171,7 @@ export default function Payments() {
     setSubmitting(true);
     try {
       const reference = `BH${Date.now().toString().slice(-8)}`;
-      const result = await initiatePayHeroPayment({ amount: numericAmount, phoneNumber: phone, reference, description: `${tenantHome.unit} rent` });
+      const result = await initiatePayHeroPayment({ amount: numericAmount, phoneNumber: phone, reference, description: `${tenantHome.unit} ${paymentLabel.toLowerCase()}` });
       setShowPay(false);
       Alert.alert("Check your phone", result.message || "Enter your M-Pesa PIN to complete payment.");
     } catch (error) {
@@ -172,11 +187,58 @@ export default function Payments() {
         <View className="mt-4"><Text className="text-2xl font-rubik-bold text-black-300">Payments</Text><Text className="mt-1 text-sm font-rubik text-black-100">Rent, receipts and account balance</Text></View>
         <View className="mt-6 rounded-[28px] bg-[#102A55] p-5">
           <View className="flex-row items-start justify-between"><View><Text className="text-xs font-rubik text-white/60">CURRENT BALANCE</Text><Text className="mt-2 text-3xl font-rubik-bold text-white">{formatPrice(tenantHome.balance)}</Text><Text className="mt-1 text-xs font-rubik text-[#B8C8EB]">{tenantHome.dueLabel}</Text></View><View className="size-12 items-center justify-center rounded-2xl bg-white/15"><Wallet size={24} color="#FFFFFF" /></View></View>
-          <TouchableOpacity onPress={() => setShowPay(true)} className="mt-5 items-center justify-center rounded-full bg-[#23C483] py-4"><Text className="font-rubik-bold text-white">Pay rent with M-Pesa</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => openPayment("Rent", tenantHome.balance)} className="mt-5 items-center justify-center rounded-full bg-[#23C483] py-4"><Text className="font-rubik-bold text-white">Pay rent with M-Pesa</Text></TouchableOpacity>
         </View>
         <View className="mt-4 flex-row justify-between">
           <View className="w-[48%] rounded-[22px] bg-white p-4"><Text className="text-xs font-rubik text-black-100">Paid this lease</Text><Text className="mt-2 text-lg font-rubik-bold text-black-300">{formatPrice(paidTotal)}</Text></View>
           <View className="w-[48%] rounded-[22px] bg-white p-4"><Text className="text-xs font-rubik text-black-100">Payment method</Text><Text className="mt-2 text-lg font-rubik-bold text-black-300">M-Pesa</Text></View>
+        </View>
+
+        <View className="mt-5 rounded-[26px] bg-white p-5 shadow-sm shadow-slate-200">
+          <View className="flex-row items-start justify-between">
+            <View>
+              <Text className="text-lg font-rubik-bold text-black-300">Bills & utilities</Text>
+              <Text className="mt-1 text-xs font-rubik text-black-100">Due with your next payment</Text>
+            </View>
+            <View className="items-end">
+              <Text className="text-[11px] font-rubik text-black-100">TOTAL DUE</Text>
+              <Text className="mt-1 text-base font-rubik-bold text-black-300">{formatPrice(chargesTotal)}</Text>
+            </View>
+          </View>
+
+          <View className="mt-4">
+            {currentCharges.map((charge, index) => {
+              const ChargeIcon = charge.icon;
+              return (
+                <View key={charge.id} className={`flex-row items-center py-3 ${index < currentCharges.length - 1 ? "border-b border-primary-100" : ""}`}>
+                  <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: charge.background }}>
+                    <ChargeIcon size={21} color={charge.color} strokeWidth={2.1} />
+                  </View>
+                  <View className="ml-3 flex-1">
+                    <Text className="font-rubik-semibold text-black-300">{charge.label}</Text>
+                    <Text className="mt-1 text-[11px] font-rubik text-black-100">{charge.detail}</Text>
+                  </View>
+                  {charge.amount > 0 ? (
+                    <View className="items-end">
+                      <Text className="font-rubik-bold text-black-300">{formatPrice(charge.amount)}</Text>
+                      <TouchableOpacity onPress={() => openPayment(charge.label, charge.amount)} className="mt-1 rounded-full bg-primary-100 px-3 py-1.5">
+                        <Text className="text-[11px] font-rubik-semibold text-primary-300">Pay now</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View className="rounded-full bg-[#EAFBF4] px-3 py-1.5">
+                      <Text className="text-[11px] font-rubik-semibold text-[#159B6C]">Clear</Text>
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+
+          <TouchableOpacity onPress={() => openPayment("Bills and utilities", chargesTotal)} className="mt-3 h-12 flex-row items-center justify-center rounded-full bg-[#102A55]">
+            <Wallet size={17} color="#FFFFFF" strokeWidth={2.2} />
+            <Text className="ml-2 font-rubik-bold text-white">Pay all bills</Text>
+          </TouchableOpacity>
         </View>
 
         <View className="mt-4 overflow-hidden rounded-[26px] border border-white/80 bg-white p-5 shadow-sm shadow-slate-200">
@@ -269,7 +331,7 @@ export default function Payments() {
       <Modal visible={showPay} transparent animationType="slide" onRequestClose={() => setShowPay(false)}>
         <View className="flex-1 justify-end bg-[#071F4A]/45"><View className="rounded-t-[34px] bg-white px-6 pb-9 pt-5">
           <View className="mb-5 h-1.5 w-12 self-center rounded-full bg-primary-200" />
-          <View className="flex-row items-center justify-between"><View><Text className="text-2xl font-rubik-bold text-black-300">Pay with M-Pesa</Text><Text className="mt-1 text-sm font-rubik text-black-100">A secure PayHero STK prompt</Text></View><TouchableOpacity onPress={() => setShowPay(false)} className="size-10 items-center justify-center rounded-full bg-primary-100"><X size={22} color="#17213C" /></TouchableOpacity></View>
+          <View className="flex-row items-center justify-between"><View><Text className="text-2xl font-rubik-bold text-black-300">Pay with M-Pesa</Text><Text className="mt-1 text-sm font-rubik text-black-100">{paymentLabel} - Secure PayHero STK prompt</Text></View><TouchableOpacity onPress={() => setShowPay(false)} className="size-10 items-center justify-center rounded-full bg-primary-100"><X size={22} color="#17213C" /></TouchableOpacity></View>
           <Text className="mb-2 mt-6 text-sm font-rubik-semibold text-black-300">M-Pesa phone number</Text>
           <TextInput value={phone} onChangeText={setPhone} keyboardType="phone-pad" placeholder="0712 345 678" placeholderTextColor="#98A2B3" className="h-14 rounded-2xl border border-primary-200 bg-accent-100 px-4 font-rubik text-black-300" />
           <Text className="mb-2 mt-4 text-sm font-rubik-semibold text-black-300">Amount (KES)</Text>
