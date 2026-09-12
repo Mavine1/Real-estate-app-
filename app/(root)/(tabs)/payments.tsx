@@ -1,4 +1,6 @@
 import { ChartColumn, Check, Download, Eye, FileText, ShieldCheck, Smartphone, Wallet, X } from "lucide-react-native";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
 import { useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,10 +8,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { tenantHome, tenantPayments } from "@/constants/rental";
 import { formatPrice } from "@/lib/format";
 import { initiatePayHeroPayment } from "@/lib/payhero";
+import { useGlobalContext } from "@/lib/global-provider";
+
+const escapeHtml = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 export default function Payments() {
+  const { user } = useGlobalContext();
   const [showPay, setShowPay] = useState(false);
   const [showStatement, setShowStatement] = useState(false);
+  const [downloadingStatement, setDownloadingStatement] = useState(false);
   const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState(String(tenantHome.balance));
   const [submitting, setSubmitting] = useState(false);
@@ -26,6 +34,96 @@ export default function Payments() {
     []
   );
   const maxChartAmount = Math.max(...paymentChart.map((item) => item.amount));
+
+  const downloadStatement = async () => {
+    setDownloadingStatement(true);
+    try {
+      const tenantName = escapeHtml(user?.name || "Tenant");
+      const generatedOn = new Intl.DateTimeFormat("en-KE", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }).format(new Date());
+      const transactionRows = tenantPayments
+        .map(
+          (item) => `
+            <tr>
+              <td>${escapeHtml(item.date)}</td>
+              <td>${escapeHtml(item.description)}</td>
+              <td>${escapeHtml(item.method)}</td>
+              <td>${escapeHtml(item.receipt)}</td>
+              <td class="amount">${escapeHtml(formatPrice(item.amount))}</td>
+              <td><span class="paid">${escapeHtml(item.status)}</span></td>
+            </tr>`
+        )
+        .join("");
+
+      const html = `
+        <!doctype html>
+        <html>
+          <head>
+            <meta charset="utf-8" />
+            <style>
+              @page { margin: 36px; }
+              body { font-family: Arial, sans-serif; color: #17213c; margin: 0; }
+              .header { background: #102a55; color: white; padding: 28px; border-radius: 18px; }
+              .brand { color: #75a0ff; font-size: 13px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; }
+              h1 { margin: 8px 0 4px; font-size: 30px; }
+              .muted { color: #667085; font-size: 12px; }
+              .header .muted { color: #b8c8eb; }
+              .details, .summary { display: flex; gap: 14px; margin-top: 20px; }
+              .box { flex: 1; border: 1px solid #d8e5ff; border-radius: 14px; padding: 14px; }
+              .label { color: #667085; font-size: 10px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; }
+              .value { margin-top: 6px; font-size: 16px; font-weight: 700; }
+              table { width: 100%; border-collapse: collapse; margin-top: 26px; font-size: 11px; }
+              th { background: #eef4ff; color: #667085; padding: 11px 8px; text-align: left; text-transform: uppercase; font-size: 9px; }
+              td { border-bottom: 1px solid #e8edf7; padding: 12px 8px; }
+              .amount { font-weight: 700; white-space: nowrap; }
+              .paid { color: #117a56; background: #eafbf4; padding: 5px 8px; border-radius: 12px; font-weight: 700; }
+              .footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid #d8e5ff; color: #98a2b3; font-size: 10px; }
+            </style>
+          </head>
+          <body>
+            <section class="header">
+              <div class="brand">Baraka Homes</div>
+              <h1>Rent Statement</h1>
+              <div class="muted">Generated on ${escapeHtml(generatedOn)}</div>
+            </section>
+            <section class="details">
+              <div class="box"><div class="label">Tenant</div><div class="value">${tenantName}</div></div>
+              <div class="box"><div class="label">Unit</div><div class="value">${escapeHtml(tenantHome.unit)}</div></div>
+              <div class="box"><div class="label">Property</div><div class="value">${escapeHtml(tenantHome.property)}</div></div>
+            </section>
+            <section class="summary">
+              <div class="box"><div class="label">Total paid</div><div class="value">${escapeHtml(formatPrice(paidTotal))}</div></div>
+              <div class="box"><div class="label">Balance due</div><div class="value">${escapeHtml(formatPrice(tenantHome.balance))}</div></div>
+              <div class="box"><div class="label">Lease ends</div><div class="value">${escapeHtml(tenantHome.leaseEnds)}</div></div>
+            </section>
+            <table>
+              <thead><tr><th>Date</th><th>Description</th><th>Method</th><th>Receipt</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody>${transactionRows}</tbody>
+            </table>
+            <div class="footer">This statement was generated securely by Baraka Homes. Contact your property agent if any payment information is incorrect.</div>
+          </body>
+        </html>`;
+
+      const { uri } = await Print.printToFileAsync({ html });
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri, {
+          mimeType: "application/pdf",
+          UTI: "com.adobe.pdf",
+          dialogTitle: "Save or share rent statement",
+        });
+      } else {
+        Alert.alert("Statement created", `Your PDF was created at ${uri}`);
+      }
+    } catch (error) {
+      console.error("[Payments] Statement download failed:", error);
+      Alert.alert("Download failed", "We could not create the statement PDF. Please try again.");
+    } finally {
+      setDownloadingStatement(false);
+    }
+  };
 
   const pay = async () => {
     const numericAmount = Number(amount.replace(/[^0-9]/g, ""));
@@ -157,9 +255,15 @@ export default function Payments() {
               ))}
             </ScrollView>
 
-            <TouchableOpacity onPress={() => Alert.alert("Statement ready", "PDF download will be enabled when statement files are connected.")} className="mt-3 h-14 flex-row items-center justify-center rounded-full bg-primary-300">
-              <Download size={19} color="#FFFFFF" strokeWidth={2.2} />
-              <Text className="ml-2 font-rubik-bold text-white">Download statement</Text>
+            <TouchableOpacity disabled={downloadingStatement} onPress={downloadStatement} className="mt-3 h-14 flex-row items-center justify-center rounded-full bg-primary-300">
+              {downloadingStatement ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <>
+                  <Download size={19} color="#FFFFFF" strokeWidth={2.2} />
+                  <Text className="ml-2 font-rubik-bold text-white">Download statement</Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
         </View>
