@@ -1,9 +1,19 @@
-import { ChartColumn, Check, Download, Eye, FileText, ShieldCheck, Smartphone, Wallet, X } from "lucide-react-native";
+import { CalendarDays, Check, Download, Eye, FileText, ShieldCheck, Smartphone, Wallet, X } from "lucide-react-native";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Svg, {
+  Defs,
+  Line,
+  LinearGradient as SvgLinearGradient,
+  Pattern,
+  Polygon,
+  Rect,
+  Stop,
+  Text as SvgText,
+} from "react-native-svg";
 
 import { tenantHome, tenantPayments } from "@/constants/rental";
 import { formatPrice } from "@/lib/format";
@@ -157,38 +167,74 @@ export default function Payments() {
           <View className="w-[48%] rounded-[22px] bg-white p-4"><Text className="text-xs font-rubik text-black-100">Payment method</Text><Text className="mt-2 text-lg font-rubik-bold text-black-300">M-Pesa</Text></View>
         </View>
 
-        <View className="mt-4 rounded-[26px] bg-white p-5 shadow-sm shadow-slate-200">
+        <View className="mt-4 overflow-hidden rounded-[26px] border border-white/80 bg-white p-5 shadow-sm shadow-slate-200">
           <View className="flex-row items-start justify-between">
             <View>
-              <Text className="text-lg font-rubik-bold text-black-300">Rent overview</Text>
-              <Text className="mt-1 text-xs font-rubik text-black-100">Paid versus current amount due</Text>
+              <Text className="text-base font-rubik-semibold text-black-300">Payment Insights</Text>
+              <Text className="mt-2 text-[28px] font-rubik-bold text-black-300">{formatPrice(paidTotal)}</Text>
+              <Text className="mt-1 text-xs font-rubik text-black-100">Total rent paid this lease</Text>
             </View>
-            <View className="size-10 items-center justify-center rounded-2xl bg-primary-100">
-              <ChartColumn size={21} color="#2F6BFF" strokeWidth={2.2} />
+            <View className="flex-row items-center rounded-xl border border-primary-100 bg-white px-3 py-2">
+              <CalendarDays size={14} color="#667085" strokeWidth={2.1} />
+              <Text className="ml-2 text-[11px] font-rubik-medium text-black-200">Jul – Oct</Text>
             </View>
           </View>
-          <View className="mt-5 h-36 flex-row items-end justify-between border-b border-primary-100 px-1 pb-2">
-            {paymentChart.map((item) => (
-              <View key={item.label} className="h-full flex-1 items-center justify-end">
-                <Text className="mb-2 text-[10px] font-rubik-semibold text-black-100">
-                  {Math.round(item.amount / 1000)}k
-                </Text>
-                <View className="h-24 w-8 justify-end overflow-hidden rounded-full bg-primary-100">
-                  <View
-                    className={`w-full rounded-full ${item.paid ? "bg-primary-300" : "bg-[#F2A65A]"}`}
-                    style={{ height: `${Math.max(18, (item.amount / maxChartAmount) * 100)}%` }}
-                  />
-                </View>
-                <Text className={`mt-2 text-[11px] font-rubik-semibold ${item.paid ? "text-black-200" : "text-[#C76A22]"}`}>
-                  {item.label}
-                </Text>
-              </View>
-            ))}
+
+          <View className="mt-3 h-[220px]">
+            <Svg width="100%" height="100%" viewBox="0 0 360 220">
+              <Defs>
+                <SvgLinearGradient id="paidBar" x1="0" y1="0" x2="0" y2="1">
+                  <Stop offset="0" stopColor="#08A7A7" stopOpacity="1" />
+                  <Stop offset="0.62" stopColor="#35C7C5" stopOpacity="0.72" />
+                  <Stop offset="1" stopColor="#DFFFFF" stopOpacity="0.12" />
+                </SvgLinearGradient>
+                <SvgLinearGradient id="dueBar" x1="0" y1="0" x2="0" y2="1">
+                  <Stop offset="0" stopColor="#F2A65A" stopOpacity="0.95" />
+                  <Stop offset="1" stopColor="#FFF1DF" stopOpacity="0.16" />
+                </SvgLinearGradient>
+                <Pattern id="diagonalLines" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+                  <Line x1="0" y1="0" x2="0" y2="7" stroke="#FFFFFF" strokeWidth="2" strokeOpacity="0.45" />
+                </Pattern>
+              </Defs>
+
+              {[45, 90, 135, 180].map((y, index) => (
+                <Line key={`grid-${y}`} x1="38" y1={y} x2="352" y2={y} stroke="#E9EEF7" strokeWidth="1" strokeDasharray={index === 3 ? undefined : "3 5"} />
+              ))}
+              <SvgText x="3" y="49" fontSize="9" fill="#98A2B3">25k</SvgText>
+              <SvgText x="3" y="94" fontSize="9" fill="#98A2B3">17k</SvgText>
+              <SvgText x="3" y="139" fontSize="9" fill="#98A2B3">8k</SvgText>
+              <SvgText x="10" y="184" fontSize="9" fill="#98A2B3">0</SvgText>
+
+              {paymentChart.map((item, index) => {
+                const x = 50 + index * 78;
+                const width = 50;
+                const depth = 10;
+                const height = Math.max(24, (item.amount / maxChartAmount) * 128);
+                const y = 180 - height;
+                const frontFill = item.paid ? "url(#paidBar)" : "url(#dueBar)";
+                const sideFill = item.paid ? "#8DE7E7" : "#FFD5AA";
+
+                return (
+                  <Fragment key={item.label}>
+                    <Polygon
+                      points={`${x + width},${y} ${x + width + depth},${y + 7} ${x + width + depth},180 ${x + width},180`}
+                      fill={sideFill}
+                      opacity="0.78"
+                    />
+                    <Rect x={x} y={y} width={width} height={height} rx="2" fill={frontFill} />
+                    <Rect x={x} y={y} width={width} height={height} rx="2" fill="url(#diagonalLines)" />
+                    <SvgText x={x + width / 2} y="205" textAnchor="middle" fontSize="10" fontWeight="600" fill={item.paid ? "#667085" : "#C76A22"}>
+                      {item.label}
+                    </SvgText>
+                  </Fragment>
+                );
+              })}
+            </Svg>
           </View>
-          <View className="mt-4 flex-row items-center justify-between">
-            <View className="flex-row items-center"><View className="mr-2 size-2.5 rounded-full bg-primary-300" /><Text className="text-xs font-rubik text-black-100">Paid</Text></View>
-            <View className="flex-row items-center"><View className="mr-2 size-2.5 rounded-full bg-[#F2A65A]" /><Text className="text-xs font-rubik text-black-100">Due</Text></View>
-            <Text className="text-xs font-rubik-semibold text-[#159B6C]">3 months paid</Text>
+
+          <View className="-mt-1 flex-row items-center justify-between rounded-2xl bg-[#F7FAFC] px-4 py-3">
+            <View className="flex-row items-center"><View className="mr-2 size-2.5 rounded-full bg-[#08A7A7]" /><Text className="text-xs font-rubik text-black-100">Paid rent</Text></View>
+            <View className="flex-row items-center"><View className="mr-2 size-2.5 rounded-full bg-[#F2A65A]" /><Text className="text-xs font-rubik text-black-100">Amount due</Text></View>
           </View>
         </View>
 
