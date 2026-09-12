@@ -1,4 +1,5 @@
 import { CalendarDays, Check, Download, Eye, FileText, ShieldCheck, Smartphone, Wallet, X } from "lucide-react-native";
+import { File, Paths } from "expo-file-system";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { Fragment, useMemo, useState } from "react";
@@ -118,8 +119,19 @@ export default function Payments() {
         </html>`;
 
       const { uri } = await Print.printToFileAsync({ html });
+      const generatedFile = new File(uri);
+      const statementFile = new File(
+        Paths.cache,
+        `baraka-homes-rent-statement-${tenantHome.unit.toLowerCase()}-${Date.now()}.pdf`
+      );
+
+      if (statementFile.exists) {
+        statementFile.delete();
+      }
+      await generatedFile.copy(statementFile);
+
       if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(uri, {
+        await Sharing.shareAsync(statementFile.uri, {
           mimeType: "application/pdf",
           UTI: "com.adobe.pdf",
           dialogTitle: "Save or share rent statement",
