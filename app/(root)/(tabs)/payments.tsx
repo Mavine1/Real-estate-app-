@@ -331,7 +331,7 @@ export default function Payments() {
       <Modal visible={showPay} transparent animationType="slide" onRequestClose={() => setShowPay(false)}>
         <View className="flex-1 justify-end bg-[#071F4A]/45"><View className="rounded-t-[34px] bg-white px-6 pb-9 pt-5">
           <View className="mb-5 h-1.5 w-12 self-center rounded-full bg-primary-200" />
-          <View className="flex-row items-center justify-between"><View><Text className="text-2xl font-rubik-bold text-black-300">Pay with M-Pesa</Text><Text className="mt-1 text-sm font-rubik text-black-100">{paymentLabel} - Secure PayHero STK prompt</Text></View><TouchableOpacity onPress={() => setShowPay(false)} className="size-10 items-center justify-center rounded-full bg-primary-100"><X size={22} color="#17213C" /></TouchableOpacity></View>
+          <View className="flex-row items-center justify-between"><View><Text className="text-2xl font-rubik-bold text-black-300">Pay with M-Pesa</Text><Text className="mt-1 text-sm font-rubik text-black-100">{paymentLabel}</Text></View><TouchableOpacity onPress={() => setShowPay(false)} className="size-10 items-center justify-center rounded-full bg-primary-100"><X size={22} color="#17213C" /></TouchableOpacity></View>
           <Text className="mb-2 mt-6 text-sm font-rubik-semibold text-black-300">M-Pesa phone number</Text>
           <TextInput value={phone} onChangeText={setPhone} keyboardType="phone-pad" placeholder="0712 345 678" placeholderTextColor="#98A2B3" className="h-14 rounded-2xl border border-primary-200 bg-accent-100 px-4 font-rubik text-black-300" />
           <Text className="mb-2 mt-4 text-sm font-rubik-semibold text-black-300">Amount (KES)</Text>
