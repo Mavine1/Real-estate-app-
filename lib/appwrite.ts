@@ -156,12 +156,17 @@ const syncUserProfile = async (user: AppUser, provider: "google" | "email") => {
   // mirrors the profile into a Database collection when one is configured.
   if (!config.databaseId || !config.userProfilesCollectionId) return false;
 
-  const profile = {
+  const profile: {
+    name: string;
+    email: string;
+    provider: "google" | "email";
+    avatar?: string;
+  } = {
     name: user.name,
     email: user.email,
-    avatar: user.avatar,
     provider,
   };
+  if (/^https?:\/\//.test(user.avatar)) profile.avatar = user.avatar;
 
   try {
     await databases.updateDocument(
