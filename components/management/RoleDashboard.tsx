@@ -47,7 +47,7 @@ export default function RoleDashboard() {
               <Text className="mt-0.5 text-lg font-rubik-bold text-black-300">Hi, {firstName}</Text>
             </View>
           </View>
-          <TouchableOpacity onPress={() => Alert.alert("Agent notifications", "3 tenants have rent reminders due.\n2 maintenance requests are open.\n1 home is currently vacant.")} className="size-11 items-center justify-center rounded-full bg-white"><Bell size={22} color="#17213C" /></TouchableOpacity>
+          <TouchableOpacity onPress={() => Alert.alert(owner ? "Owner notifications" : "Agent notifications", owner ? "7 approvals require your review.\n1 owner payout is processing.\n2 leases expire this month." : "3 tenants have rent reminders due.\n2 maintenance requests are open.\n1 home is currently vacant.")} className="size-11 items-center justify-center rounded-full bg-white"><Bell size={22} color="#17213C" /></TouchableOpacity>
         </View>
 
         {owner ? (
@@ -66,6 +66,17 @@ export default function RoleDashboard() {
               <Stat label="Management fee" value={formatPrice(ownerOverview.managementFee)} />
               <Stat label="Occupancy" value={`${ownerOverview.occupancy}%`} accent />
             </View>
+            <View className="mt-4 rounded-[24px] bg-white p-5">
+              <View className="flex-row items-center justify-between"><View><Text className="font-rubik-bold text-black-300">Revenue trend</Text><Text className="mt-1 text-xs font-rubik text-black-100">Expected vs collected rent</Text></View><Text className="font-rubik-semibold text-[#159B6C]">+6.4%</Text></View>
+              <View className="mt-5 h-32 flex-row items-end justify-between">{[52, 70, 63, 88, 76, 98].map((height, index) => <View key={index} className="items-center"><View className="w-6 rounded-t-lg bg-primary-200" style={{ height }}><View className="absolute bottom-0 w-6 rounded-t-lg bg-primary-300" style={{ height: Math.max(24, height - 15) }} /></View><Text className="mt-2 text-[10px] font-rubik text-black-100">{["Apr", "May", "Jun", "Jul", "Aug", "Sep"][index]}</Text></View>)}</View>
+            </View>
+            <Text className="mb-3 mt-7 text-lg font-rubik-bold text-black-300">Owner actions</Text>
+            {[
+              { title: "Property portfolio", subtitle: "8 properties · 126 units", section: "homes" },
+              { title: "Agent performance", subtitle: "4 active agents · 94% collection", section: "agents" },
+              { title: "Payouts & reports", subtitle: "Statements and recent transfers", section: "payouts" },
+              { title: "Approval centre", subtitle: "7 requests require review", section: "approvals" },
+            ].map((item) => <TouchableOpacity key={item.title} onPress={() => router.push({ pathname: "/(root)/(tabs)/management", params: { section: item.section } })} className="mb-3 flex-row items-center rounded-[22px] bg-white p-4"><View className="size-11 items-center justify-center rounded-2xl bg-primary-100"><Building2 size={21} color="#2F6BFF" /></View><View className="ml-3 flex-1"><Text className="font-rubik-semibold text-black-300">{item.title}</Text><Text className="mt-1 text-xs font-rubik text-black-100">{item.subtitle}</Text></View><ChevronRight size={19} color="#98A2B3" /></TouchableOpacity>)}
           </>
         ) : (
           <>
