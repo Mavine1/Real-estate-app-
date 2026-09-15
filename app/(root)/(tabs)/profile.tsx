@@ -4,6 +4,7 @@ import {
   Image,
   Modal,
   ScrollView,
+  Share,
   Switch,
   Text,
   TextInput,
@@ -23,6 +24,7 @@ import {
   LogOut,
   Pencil,
   ShieldCheck,
+  Gift,
   UserRound,
   WalletCards,
   type LucideIcon,
@@ -76,6 +78,7 @@ const Profile = () => {
   const [profileSettingsOpen, setProfileSettingsOpen] = useState(false);
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [securityModalVisible, setSecurityModalVisible] = useState(false);
+  const [referralModalVisible, setReferralModalVisible] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -196,6 +199,19 @@ const Profile = () => {
     }
   };
 
+  const referralCode = `BARAKA-${(user?.$id ?? "WELCOME").slice(-6).toUpperCase()}`;
+  const referralLink = `https://barakahomes.app/join?ref=${referralCode}`;
+
+  const handleShareReferral = async () => {
+    try {
+      await Share.share({
+        message: `Join me on Baraka Homes and find your next place. Use my referral code ${referralCode}: ${referralLink}`,
+      });
+    } catch (error) {
+      console.warn("[Profile] Referral share cancelled or failed:", error);
+    }
+  };
+
   return (
     <SafeAreaView className="h-full bg-transparent">
       <ScrollView
@@ -255,6 +271,7 @@ const Profile = () => {
               <SettingsItem icon={Pencil} title="Change profile photo" onPress={handleChangeAvatar} />
               <SettingsItem icon={KeyRound} title="Change password" onPress={() => setPasswordModalVisible(true)} />
               <SettingsItem icon={ShieldCheck} title="Security settings" onPress={() => setSecurityModalVisible(true)} />
+              <SettingsItem icon={Gift} title="Referral code & link" onPress={() => setReferralModalVisible(true)} />
             </View>
           )}
         </View>
@@ -333,6 +350,22 @@ const Profile = () => {
               {savingSecurity ? <ActivityIndicator color="#FFFFFF" /> : <Text className="font-rubik-bold text-white">Save security settings</Text>}
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setSecurityModalVisible(false)} className="mt-4 items-center"><Text className="font-rubik-medium text-black-200">Cancel</Text></TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal transparent visible={referralModalVisible} animationType="slide" onRequestClose={() => setReferralModalVisible(false)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <View className="rounded-t-[30px] bg-white px-6 pb-9 pt-6">
+            <View className="size-12 items-center justify-center rounded-2xl bg-[#FFF2D8]"><Gift size={23} color="#D88700" strokeWidth={2.2} /></View>
+            <Text className="mt-4 text-xl font-rubik-bold text-black-300">Invite a friend</Text>
+            <Text className="mt-1 text-sm leading-5 font-rubik text-black-200">Share your code and link with someone looking for their next home.</Text>
+            <Text className="mt-6 text-xs font-rubik-semibold text-black-100">YOUR REFERRAL CODE</Text>
+            <View className="mt-2 rounded-2xl border border-dashed border-primary-300 bg-primary-100 px-4 py-4"><Text className="text-center text-lg font-rubik-bold tracking-widest text-primary-300">{referralCode}</Text></View>
+            <Text className="mt-5 text-xs font-rubik-semibold text-black-100">YOUR REFERRAL LINK</Text>
+            <Text selectable className="mt-2 rounded-2xl bg-primary-100 px-4 py-4 text-xs leading-5 font-rubik text-primary-300">{referralLink}</Text>
+            <TouchableOpacity onPress={handleShareReferral} className="mt-5 h-14 items-center justify-center rounded-full bg-primary-300"><Text className="font-rubik-bold text-white">Share invitation</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => setReferralModalVisible(false)} className="mt-4 items-center"><Text className="font-rubik-medium text-black-200">Close</Text></TouchableOpacity>
           </View>
         </View>
       </Modal>
