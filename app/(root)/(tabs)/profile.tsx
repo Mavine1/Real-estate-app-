@@ -23,6 +23,7 @@ import {
   LogOut,
   Pencil,
   ShieldCheck,
+  UserRound,
   WalletCards,
   type LucideIcon,
 } from "lucide-react-native";
@@ -72,6 +73,7 @@ const SettingsItem = ({
 const Profile = () => {
   const { user, refetch, setUser } = useGlobalContext();
   const [updatingAvatar, setUpdatingAvatar] = useState(false);
+  const [profileSettingsOpen, setProfileSettingsOpen] = useState(false);
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [securityModalVisible, setSecurityModalVisible] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -243,10 +245,18 @@ const Profile = () => {
         </View>
 
         <View className="flex flex-col mt-10">
-          <Text className="mb-2 text-sm font-rubik-semibold text-black-100">ACCOUNT</Text>
-          <SettingsItem icon={Pencil} title="Change profile photo" onPress={handleChangeAvatar} />
-          <SettingsItem icon={KeyRound} title="Change password" onPress={() => setPasswordModalVisible(true)} />
-          <SettingsItem icon={ShieldCheck} title="Security settings" onPress={() => setSecurityModalVisible(true)} />
+          <SettingsItem
+            icon={UserRound}
+            title="Profile"
+            onPress={() => setProfileSettingsOpen((open) => !open)}
+          />
+          {profileSettingsOpen && (
+            <View className="ml-5 border-l border-primary-200 pl-5">
+              <SettingsItem icon={Pencil} title="Change profile photo" onPress={handleChangeAvatar} />
+              <SettingsItem icon={KeyRound} title="Change password" onPress={() => setPasswordModalVisible(true)} />
+              <SettingsItem icon={ShieldCheck} title="Security settings" onPress={() => setSecurityModalVisible(true)} />
+            </View>
+          )}
         </View>
 
         <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
