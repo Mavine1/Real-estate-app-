@@ -11,6 +11,7 @@ import {
 } from "lucide-react-native";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
 
 import images from "@/constants/images";
 import { agentOverview, ownerOverview } from "@/constants/rental";
@@ -87,6 +88,10 @@ export default function RoleDashboard() {
           </>
         )}
 
+        {!owner && <View className="mb-2 flex-row flex-wrap justify-between">
+          <TouchableOpacity onPress={() => router.push({ pathname: "/(root)/(tabs)/management", params: { section: "homes" } })} className="mb-3 w-[48%] rounded-[22px] bg-white p-4"><Building2 size={21} color="#2F6BFF" /><Text className="mt-3 font-rubik-bold text-black-300">Manage homes</Text><Text className="mt-1 text-[11px] font-rubik text-black-100">Vacant & occupied</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push({ pathname: "/(root)/(tabs)/management", params: { section: "messages" } })} className="mb-3 w-[48%] rounded-[22px] bg-white p-4"><Users size={21} color="#2F6BFF" /><Text className="mt-3 font-rubik-bold text-black-300">Messages</Text><Text className="mt-1 text-[11px] font-rubik text-black-100">Tenant communication</Text></TouchableOpacity>
+        </View>}
         <Text className="mb-3 mt-5 text-lg font-rubik-bold text-black-300">{owner ? "Property snapshot" : "Quick actions"}</Text>
         <View className="rounded-[24px] bg-white p-5">
           <View className="flex-row items-center"><View className="size-12 items-center justify-center rounded-2xl bg-primary-100"><Building2 size={24} color="#2F6BFF" /></View><View className="ml-3 flex-1"><Text className="font-rubik-bold text-black-300">Sunrise Apartments</Text><Text className="mt-1 text-xs font-rubik text-black-100">48 units • 43 occupied • Kilimani</Text></View><ChevronRight size={20} color="#98A2B3" /></View>

@@ -1,0 +1,113 @@
+import { useMemo, useState } from "react";
+import { Image, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import {
+  Building2, ChevronRight, CircleDollarSign, ImagePlus, Mail, MessageCircle,
+  Plus, Send, Users, WalletCards, X,
+} from "lucide-react-native";
+import * as ImagePicker from "expo-image-picker";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { formatPrice } from "@/lib/format";
+import { useGlobalContext } from "@/lib/global-provider";
+import { managedProperties } from "@/lib/managed-properties";
+
+type AgentSection = "homes" | "tenants" | "messages" | "payouts";
+type HomeStatus = "Occupied" | "Vacant";
+
+const tenants = [
+  { name: "Amina Hassan", unit: "A-204", home: "Parkview Apartments", rent: 42000, status: "Paid" },
+  { name: "Brian Otieno", unit: "B-12", home: "Garden Villa", rent: 125000, status: "Overdue" },
+  { name: "Wanjiku Njeri", unit: "C-08", home: "Riverside Retail Space", rent: 68000, status: "Partial" },
+];
+
+const initialHomes = managedProperties.map((home, index) => ({
+  ...home,
+  unit: ["A-204", "Villa 12", "Shop 08", "Suite 16"][index],
+  status: (index === 2 ? "Vacant" : "Occupied") as HomeStatus,
+}));
+
+const Chip = ({ selected, label, onPress }: { selected: boolean; label: string; onPress: () => void }) => (
+  <TouchableOpacity onPress={onPress} className={`mr-2 rounded-full px-4 py-2.5 ${selected ? "bg-primary-300" : "bg-white"}`}>
+    <Text className={`text-xs font-rubik-semibold ${selected ? "text-white" : "text-black-200"}`}>{label}</Text>
+  </TouchableOpacity>
+);
+
+const Status = ({ value }: { value: string }) => {
+  const vacant = value === "Vacant";
+  const overdue = value === "Overdue";
+  return <View className={`rounded-full px-3 py-1.5 ${vacant || overdue ? "bg-[#FFF0EE]" : "bg-[#EAFBF4]"}`}><Text className={`text-[11px] font-rubik-semibold ${vacant || overdue ? "text-[#D94841]" : "text-[#159B6C]"}`}>{value}</Text></View>;
+};
+
+export default function Management() {
+  const { user } = useGlobalContext();
+  const { section } = useLocalSearchParams<{ section?: AgentSection }>();
+  const owner = user?.role === "owner";
+  const [active, setActive] = useState<AgentSection>(section || "homes");
+  const [filter, setFilter] = useState<"All" | HomeStatus>("All");
+  const [homes, setHomes] = useState(initialHomes);
+  const [listingOpen, setListingOpen] = useState(false);
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [listingName, setListingName] = useState("");
+  const [listingPrice, setListingPrice] = useState("");
+  const [listingImage, setListingImage] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
+
+  const visibleHomes = useMemo(() => filter === "All" ? homes : homes.filter((home) => home.status === filter), [filter, homes]);
+  const vacancyCount = homes.filter((home) => home.status === "Vacant").length;
+  const occupiedCount = homes.length - vacancyCount;
+
+  const chooseListingImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) return;
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], allowsEditing: true, aspect: [4, 3], quality: 0.75 });
+    if (!result.canceled) setListingImage(result.assets[0].uri);
+  };
+
+  const saveListing = () => {
+    if (!listingName.trim() || !listingPrice.trim()) return;
+    const template = managedProperties[0];
+    setHomes((current) => [{
+      ...template,
+      $id: `agent-${Date.now()}`,
+      name: listingName.trim(),
+      price: Number(listingPrice.replace(/[^0-9]/g, "")) || 0,
+      image: listingImage || template.image,
+      unit: "New unit",
+      status: "Vacant",
+    }, ...current]);
+    setListingName(""); setListingPrice(""); setListingImage(null); setListingOpen(false);
+  };
+
+  if (owner) {
+    return <SafeAreaView className="flex-1 bg-transparent"><ScrollView contentContainerClassName="px-5 pb-32"><Text className="mt-5 text-2xl font-rubik-bold text-black-300">My properties</Text><Text className="mt-1 font-rubik text-black-100">Portfolio performance and income</Text>{homes.map((home) => <View key={home.$id} className="mt-4 rounded-[24px] bg-white p-4"><Text className="font-rubik-bold text-black-300">{home.name}</Text><Text className="mt-1 text-xs font-rubik text-black-100">{home.address} · {home.unit}</Text><Text className="mt-4 font-rubik-bold text-primary-300">{formatPrice(home.price)}/mo</Text></View>)}</ScrollView></SafeAreaView>;
+  }
+
+  return (
+    <SafeAreaView className="flex-1 bg-transparent">
+      <ScrollView contentContainerClassName="px-5 pb-32" showsVerticalScrollIndicator={false}>
+        <View className="mt-4 flex-row items-center justify-between"><View><Text className="text-2xl font-rubik-bold text-black-300">Agent workspace</Text><Text className="mt-1 text-sm font-rubik text-black-100">Manage homes, tenants and collections</Text></View><TouchableOpacity onPress={() => router.push("/(root)/(tabs)/profile")} className="size-11 items-center justify-center rounded-full bg-white"><Users size={21} color="#2F6BFF" /></TouchableOpacity></View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-6">
+          {([{ key: "homes", label: "Homes", icon: Building2 }, { key: "tenants", label: "Tenants", icon: Users }, { key: "messages", label: "Messages", icon: MessageCircle }, { key: "payouts", label: "Payouts", icon: WalletCards }] as const).map(({ key, label, icon: Icon }) => <TouchableOpacity key={key} onPress={() => setActive(key)} className={`mr-2 flex-row items-center rounded-2xl px-4 py-3 ${active === key ? "bg-primary-300" : "bg-white"}`}><Icon size={17} color={active === key ? "#FFFFFF" : "#667085"} /><Text className={`ml-2 text-sm font-rubik-semibold ${active === key ? "text-white" : "text-black-200"}`}>{label}</Text></TouchableOpacity>)}
+        </ScrollView>
+
+        {active === "homes" && <>
+          <View className="mt-6 rounded-[26px] bg-[#102A55] p-5"><View className="flex-row items-center justify-between"><View><Text className="text-xs font-rubik text-white/65">PORTFOLIO OCCUPANCY</Text><Text className="mt-2 text-3xl font-rubik-bold text-white">{occupiedCount}/{homes.length}</Text><Text className="mt-1 text-xs font-rubik text-white/65">homes currently occupied</Text></View><TouchableOpacity onPress={() => setListingOpen(true)} className="size-12 items-center justify-center rounded-2xl bg-white"><Plus size={25} color="#2F6BFF" /></TouchableOpacity></View><View className="mt-5 h-2 overflow-hidden rounded-full bg-white/20"><View className="h-full rounded-full bg-[#25D991]" style={{ width: `${(occupiedCount / homes.length) * 100}%` }} /></View></View>
+          <View className="mt-6 flex-row items-center justify-between"><Text className="text-lg font-rubik-bold text-black-300">Managed homes</Text><TouchableOpacity onPress={() => setListingOpen(true)}><Text className="font-rubik-semibold text-primary-300">Add listing</Text></TouchableOpacity></View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-4"><Chip label="All" selected={filter === "All"} onPress={() => setFilter("All")} /><Chip label={`Occupied (${occupiedCount})`} selected={filter === "Occupied"} onPress={() => setFilter("Occupied")} /><Chip label={`Vacant (${vacancyCount})`} selected={filter === "Vacant"} onPress={() => setFilter("Vacant")} /></ScrollView>
+          {visibleHomes.map((home) => <TouchableOpacity key={home.$id} onPress={() => setHomes((current) => current.map((item) => item.$id === home.$id ? { ...item, status: item.status === "Vacant" ? "Occupied" : "Vacant" } : item))} className="mt-4 overflow-hidden rounded-[24px] bg-white"><Image source={{ uri: home.image }} className="h-36 w-full" /><View className="p-4"><View className="flex-row items-start"><View className="flex-1"><Text className="font-rubik-bold text-black-300">{home.name}</Text><Text className="mt-1 text-xs font-rubik text-black-100">{home.unit} · {home.address}</Text></View><Status value={home.status} /></View><View className="mt-4 flex-row items-center justify-between border-t border-primary-100 pt-3"><Text className="font-rubik-bold text-primary-300">{formatPrice(home.price)}/mo</Text><Text className="text-xs font-rubik-medium text-black-100">Tap to mark {home.status === "Vacant" ? "occupied" : "vacant"}</Text></View></View></TouchableOpacity>)}
+        </>}
+
+        {active === "tenants" && <><Text className="mt-7 text-lg font-rubik-bold text-black-300">Tenant accounts</Text>{tenants.map((tenant) => <TouchableOpacity key={tenant.unit} className="mt-3 rounded-[24px] bg-white p-4"><View className="flex-row items-center"><View className="size-11 items-center justify-center rounded-full bg-primary-100"><Text className="font-rubik-bold text-primary-300">{tenant.name.charAt(0)}</Text></View><View className="ml-3 flex-1"><Text className="font-rubik-bold text-black-300">{tenant.name}</Text><Text className="mt-1 text-xs font-rubik text-black-100">{tenant.unit} · {tenant.home}</Text></View><Status value={tenant.status} /></View><View className="mt-4 flex-row items-center justify-between border-t border-primary-100 pt-3"><Text className="font-rubik-semibold text-black-300">{formatPrice(tenant.rent)}/mo</Text><TouchableOpacity onPress={() => setMessageOpen(true)} className="flex-row items-center"><Mail size={16} color="#2F6BFF" /><Text className="ml-1 text-xs font-rubik-semibold text-primary-300">Message</Text></TouchableOpacity></View></TouchableOpacity>)}</>}
+
+        {active === "messages" && <><View className="mt-7 flex-row items-center justify-between"><Text className="text-lg font-rubik-bold text-black-300">Tenant communication</Text><TouchableOpacity onPress={() => setMessageOpen(true)} className="size-10 items-center justify-center rounded-xl bg-primary-300"><Plus size={21} color="#FFFFFF" /></TouchableOpacity></View>{[{ name: "Amina Hassan", text: "Thank you, I received the payment reminder.", time: "10:24 AM" }, { name: "Brian Otieno", text: "Could we arrange a maintenance visit?", time: "Yesterday" }].map((thread) => <TouchableOpacity key={thread.name} onPress={() => setMessageOpen(true)} className="mt-3 flex-row items-center rounded-[22px] bg-white p-4"><View className="size-11 items-center justify-center rounded-full bg-[#102A55]"><Text className="font-rubik-bold text-white">{thread.name[0]}</Text></View><View className="ml-3 flex-1"><Text className="font-rubik-bold text-black-300">{thread.name}</Text><Text numberOfLines={1} className="mt-1 text-xs font-rubik text-black-100">{thread.text}</Text></View><Text className="text-[10px] font-rubik text-black-100">{thread.time}</Text></TouchableOpacity>)}</>}
+
+        {active === "payouts" && <><View className="mt-7 rounded-[28px] bg-[#102A55] p-5"><Text className="text-xs font-rubik text-white/65">AVAILABLE TO WITHDRAW</Text><Text className="mt-2 text-3xl font-rubik-bold text-white">{formatPrice(186400)}</Text><TouchableOpacity className="mt-5 h-12 items-center justify-center rounded-full bg-[#25D991]"><Text className="font-rubik-bold text-[#102A55]">Withdraw to M-Pesa</Text></TouchableOpacity></View><Text className="mt-7 text-lg font-rubik-bold text-black-300">Collection trend</Text><View className="mt-4 h-36 flex-row items-end justify-between rounded-[24px] bg-white px-5 pb-5 pt-4">{[48, 76, 62, 92, 70, 84].map((height, index) => <View key={index} className="items-center"><View className="w-7 rounded-t-lg bg-primary-300" style={{ height }} /><Text className="mt-2 text-[10px] font-rubik text-black-100">W{index + 1}</Text></View>)}</View><View className="mt-5 rounded-[24px] bg-white p-5"><View className="flex-row items-center"><CircleDollarSign size={22} color="#2F6BFF" /><View className="ml-3"><Text className="font-rubik-bold text-black-300">Withdrawal account</Text><Text className="mt-1 text-xs font-rubik text-black-100">M-Pesa · +254 712 *** 456</Text></View><ChevronRight className="ml-auto" size={20} color="#98A2B3" /></View></View></>}
+      </ScrollView>
+
+      <Modal transparent visible={listingOpen} animationType="slide" onRequestClose={() => setListingOpen(false)}><View className="flex-1 justify-end bg-black/40"><View className="rounded-t-[30px] bg-white p-6"><View className="flex-row items-center justify-between"><Text className="text-xl font-rubik-bold text-black-300">Add managed home</Text><TouchableOpacity onPress={() => setListingOpen(false)}><X size={23} color="#667085" /></TouchableOpacity></View><TouchableOpacity onPress={chooseListingImage} className="mt-5 h-28 items-center justify-center overflow-hidden rounded-2xl border border-dashed border-primary-300 bg-primary-100">{listingImage ? <Image source={{ uri: listingImage }} className="size-full" /> : <><ImagePlus size={25} color="#2F6BFF" /><Text className="mt-2 font-rubik-medium text-primary-300">Upload house image</Text></>}</TouchableOpacity><TextInput value={listingName} onChangeText={setListingName} placeholder="Property name" className="mt-4 h-14 rounded-2xl border border-primary-200 px-4 font-rubik" /><TextInput value={listingPrice} onChangeText={setListingPrice} keyboardType="numeric" placeholder="Monthly rent (KSh)" className="mt-3 h-14 rounded-2xl border border-primary-200 px-4 font-rubik" /><TouchableOpacity onPress={saveListing} className="mt-5 h-14 items-center justify-center rounded-full bg-primary-300"><Text className="font-rubik-bold text-white">Save listing</Text></TouchableOpacity></View></View></Modal>
+      <Modal transparent visible={messageOpen} animationType="slide" onRequestClose={() => setMessageOpen(false)}><View className="flex-1 justify-end bg-black/40"><View className="rounded-t-[30px] bg-white p-6"><Text className="text-xl font-rubik-bold text-black-300">New tenant message</Text><Text className="mt-1 text-sm font-rubik text-black-100">Send an update, reminder, or response.</Text><TextInput value={message} onChangeText={setMessage} multiline placeholder="Write your message" className="mt-5 h-28 rounded-2xl border border-primary-200 p-4 font-rubik" /><TouchableOpacity onPress={() => { setMessage(""); setMessageOpen(false); }} className="mt-5 h-14 flex-row items-center justify-center rounded-full bg-primary-300"><Send size={18} color="#FFFFFF" /><Text className="ml-2 font-rubik-bold text-white">Send message</Text></TouchableOpacity></View></View></Modal>
+    </SafeAreaView>
+  );
+}

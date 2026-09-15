@@ -17,11 +17,13 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Bell,
+  Building2,
   CalendarDays,
   ChevronRight,
   KeyRound,
   LockKeyhole,
   LogOut,
+  MessageCircle,
   Pencil,
   ShieldCheck,
   Gift,
@@ -272,6 +274,11 @@ const Profile = () => {
               <SettingsItem icon={KeyRound} title="Change password" onPress={() => setPasswordModalVisible(true)} />
               <SettingsItem icon={ShieldCheck} title="Security settings" onPress={() => setSecurityModalVisible(true)} />
               <SettingsItem icon={Gift} title="Referral code & link" onPress={() => setReferralModalVisible(true)} />
+              {user?.role === "agent" && <>
+                <SettingsItem icon={Building2} title="Manage houses" onPress={() => router.push({ pathname: "/(root)/(tabs)/management", params: { section: "homes" } })} />
+                <SettingsItem icon={MessageCircle} title="Tenant communication" onPress={() => router.push({ pathname: "/(root)/(tabs)/management", params: { section: "messages" } })} />
+                <SettingsItem icon={WalletCards} title="Withdrawal account" onPress={() => router.push({ pathname: "/(root)/(tabs)/management", params: { section: "payouts" } })} />
+              </>}
             </View>
           )}
         </View>
