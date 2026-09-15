@@ -7,6 +7,7 @@ export type ManagedProperty = {
   image: string;
   gallery: { label: string; image: string }[];
   price: number;
+  rating?: number;
   bedrooms: number;
   bathrooms: number;
   area: number;

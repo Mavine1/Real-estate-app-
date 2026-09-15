@@ -9,7 +9,7 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react-native";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 
@@ -47,7 +47,7 @@ export default function RoleDashboard() {
               <Text className="mt-0.5 text-lg font-rubik-bold text-black-300">Hi, {firstName}</Text>
             </View>
           </View>
-          <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white"><Bell size={22} color="#17213C" /></TouchableOpacity>
+          <TouchableOpacity onPress={() => Alert.alert("Agent notifications", "3 tenants have rent reminders due.\n2 maintenance requests are open.\n1 home is currently vacant.")} className="size-11 items-center justify-center rounded-full bg-white"><Bell size={22} color="#17213C" /></TouchableOpacity>
         </View>
 
         {owner ? (
