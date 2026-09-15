@@ -62,7 +62,7 @@ export const Card = ({ item, onPress }: Props) => (
           {item.name}
         </Text>
         <Text className="text-base font-rubik-bold text-primary-300">
-          {formatPrice(item.price)}
+          {formatPrice(item.price)}/mo
         </Text>
       </View>
 

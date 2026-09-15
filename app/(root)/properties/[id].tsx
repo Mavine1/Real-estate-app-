@@ -101,7 +101,7 @@ const PropertyDetails = () => {
               {property?.name}
             </Text>
             <Text className="text-xl font-rubik-bold text-primary-300">
-              {formatPrice(property?.price)}
+              {formatPrice(property?.price)}/mo
             </Text>
           </View>
 
