@@ -225,6 +225,30 @@ export type AvatarUpload = {
   size: number;
 };
 
+export async function updateUserPassword(
+  currentPassword: string,
+  newPassword: string
+) {
+  if (newPassword.length < 8)
+    throw new Error("Use at least 8 characters for your new password.");
+
+  await withTimeout(
+    account.updatePassword({
+      password: newPassword,
+      oldPassword: currentPassword,
+    })
+  );
+}
+
+export async function updateSecurityPreferences(loginAlerts: boolean) {
+  const accountUser = await withTimeout(account.get());
+  await withTimeout(
+    account.updatePrefs({
+      prefs: { ...accountUser.prefs, loginAlerts },
+    })
+  );
+}
+
 export async function updateUserAvatar(file: AvatarUpload): Promise<AppUser> {
   if (!config.bucketId)
     throw new Error("The Appwrite image bucket is not configured.");
