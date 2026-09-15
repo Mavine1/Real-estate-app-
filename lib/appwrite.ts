@@ -160,13 +160,17 @@ const syncUserProfile = async (user: AppUser, provider: "google" | "email") => {
     name: string;
     email: string;
     provider: "google" | "email";
-    avatar?: string;
+    avatar: string;
   } = {
     name: user.name,
     email: user.email,
     provider,
+    // The profile collection requires a URL. Appwrite's generated initials
+    // avatar is a valid URL until the user uploads a personal photo.
+    avatar: /^https?:\/\//.test(user.avatar)
+      ? user.avatar
+      : avatar.getInitials(user.name).toString(),
   };
-  if (/^https?:\/\//.test(user.avatar)) profile.avatar = user.avatar;
 
   try {
     await databases.updateDocument(
