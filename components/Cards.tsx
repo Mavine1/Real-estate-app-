@@ -1,5 +1,4 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import { Models } from "react-native-appwrite";
 import {
   Bath,
   BedDouble,
@@ -12,7 +11,16 @@ import {
 import { formatPrice, nairobiAddress } from "@/lib/format";
 
 interface Props {
-  item: Models.DefaultDocument;
+  item: {
+    $id: string;
+    image: string;
+    type?: string;
+    name: string;
+    price: number;
+    bedrooms?: number;
+    bathrooms?: number;
+    address?: string;
+  };
   onPress?: () => void;
 }
 
@@ -61,7 +69,7 @@ export const Card = ({ item, onPress }: Props) => (
       <View className="mt-1.5 flex-row items-center">
         <MapPin size={16} color="#667085" strokeWidth={2.1} />
         <Text className="ml-1.5 text-xs font-rubik text-black-200">
-          {nairobiAddress}
+          {item.address || nairobiAddress}
         </Text>
       </View>
 

@@ -5,43 +5,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useEffect } from "react";
-import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, Bell } from "lucide-react-native";
 
-import Search from "@/components/Search";
 import { Card } from "@/components/Cards";
-import Filters from "@/components/Filters";
-import NoResults from "@/components/NoResults";
-
-import { getProperties } from "@/lib/appwrite";
-import { useAppwrite } from "@/lib/useAppwrite";
+import { managedProperties, type PropertyCategory } from "@/lib/managed-properties";
 
 const Explore = () => {
-  const params = useLocalSearchParams<{ query?: string; filter?: string }>();
-
-  const {
-    data: properties,
-    refetch,
-    loading,
-  } = useAppwrite({
-    fn: getProperties,
-    params: {
-      filter: params.filter!,
-      query: params.query!,
-    },
-    skip: true,
-  });
-
-  useEffect(() => {
-    refetch({
-      filter: params.filter!,
-      query: params.query!,
-    });
-    // `refetch` intentionally tracks the current route parameters here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.filter, params.query]);
+  const [selectedCategory, setSelectedCategory] = useState<"All" | PropertyCategory>("All");
+  const categories: ("All" | PropertyCategory)[] = ["All", "Apartments", "Houses", "Shops", "BNB"];
+  const properties = selectedCategory === "All"
+    ? managedProperties
+    : managedProperties.filter((property) => property.type === selectedCategory);
 
   const handleCardPress = (id: string) => router.push(`/properties/${id}`);
 
@@ -55,13 +32,7 @@ const Explore = () => {
         keyExtractor={(item) => item.$id}
         contentContainerClassName="pb-32"
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          loading ? (
-            <ActivityIndicator size="large" className="text-primary-300 mt-5" />
-          ) : (
-            <NoResults />
-          )
-        }
+        ListEmptyComponent={<ActivityIndicator size="large" className="text-primary-300 mt-5" />}
         ListHeaderComponent={() => (
           <View className="px-5">
             <View className="flex flex-row items-center justify-between mt-5">
@@ -73,20 +44,36 @@ const Explore = () => {
               </TouchableOpacity>
 
               <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
-                Search for Your Ideal Home
+                Managed homes
               </Text>
               <TouchableOpacity className="size-11 items-center justify-center rounded-full bg-white" accessibilityLabel="Notifications">
                 <Bell size={21} color="#17213C" strokeWidth={2.1} />
               </TouchableOpacity>
             </View>
 
-            <Search />
-
-            <View className="mt-5">
-              <Filters />
-
-              <Text className="text-xl font-rubik-bold text-black-300 mt-5">
-                Found {properties?.length} Properties
+            <View className="mt-6">
+              <Text className="text-xl font-rubik-bold text-black-300">Find your space</Text>
+              <Text className="mt-1 text-sm font-rubik text-black-200">
+                Homes personally managed by Grace Wanjiku
+              </Text>
+              <View className="mt-4 flex-row flex-wrap gap-2">
+                {categories.map((category) => {
+                  const selected = selectedCategory === category;
+                  return (
+                    <TouchableOpacity
+                      key={category}
+                      onPress={() => setSelectedCategory(category)}
+                      className={`rounded-full px-4 py-2.5 ${selected ? "bg-primary-300" : "bg-white"}`}
+                    >
+                      <Text className={`text-sm font-rubik-medium ${selected ? "text-white" : "text-black-200"}`}>
+                        {category}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              <Text className="mt-6 text-lg font-rubik-bold text-black-300">
+                {properties.length} {selectedCategory === "All" ? "managed properties" : selectedCategory}
               </Text>
             </View>
           </View>
