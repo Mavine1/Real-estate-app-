@@ -74,7 +74,7 @@ export default function RoleDashboard() {
             {[
               { title: "Property portfolio", subtitle: "8 properties · 126 units", section: "homes" },
               { title: "Agent performance", subtitle: "4 active agents · 94% collection", section: "agents" },
-              { title: "Payouts & reports", subtitle: "Statements and recent transfers", section: "payouts" },
+              { title: "Reports centre", subtitle: "PDF, Excel and CSV exports", section: "reports" },
               { title: "Approval centre", subtitle: "7 requests require review", section: "approvals" },
             ].map((item) => <TouchableOpacity key={item.title} onPress={() => router.push({ pathname: "/(root)/(tabs)/management", params: { section: item.section } })} className="mb-3 flex-row items-center rounded-[22px] bg-white p-4"><View className="size-11 items-center justify-center rounded-2xl bg-primary-100"><Building2 size={21} color="#2F6BFF" /></View><View className="ml-3 flex-1"><Text className="font-rubik-semibold text-black-300">{item.title}</Text><Text className="mt-1 text-xs font-rubik text-black-100">{item.subtitle}</Text></View><ChevronRight size={19} color="#98A2B3" /></TouchableOpacity>)}
           </>
