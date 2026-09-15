@@ -72,9 +72,6 @@ const Explore = () => {
                   );
                 })}
               </View>
-              <Text className="mt-6 text-lg font-rubik-bold text-black-300">
-                {properties.length} {selectedCategory === "All" ? "managed properties" : selectedCategory}
-              </Text>
             </View>
           </View>
         )}
