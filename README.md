@@ -2,11 +2,23 @@
 
 Baraka Homes is a mobile rental-management app for tenants, agents, and owners in Nairobi. It brings homes, rent payments, maintenance, documents, and account security into one calm, easy-to-use experience.
 
-## App preview
+## App screens
 
-| Tenant home | Welcome / onboarding |
+### Welcome
+
+<img src="assets/readme/onboarding.png" alt="Baraka Homes welcome screen" width="260" />
+
+### Tenant portal
+
+| Profile and account security | Maintenance requests |
 | --- | --- |
-| ![Tenant home residence image](assets/images/tenant-apartment-home.jpg) | ![Baraka Homes onboarding image](assets/images/onboarding-baraka.png) |
+| <img src="assets/readme/tenant-profile.png" alt="Tenant profile screen" width="260" /> | <img src="assets/readme/tenant-maintenance.png" alt="Tenant maintenance screen" width="260" /> |
+
+### Agent portal
+
+| Managed homes | Maintenance work queue | Agent profile |
+| --- | --- | --- |
+| <img src="assets/readme/agent-workspace.png" alt="Agent managed homes screen" width="220" /> | <img src="assets/readme/agent-maintenance.png" alt="Agent maintenance screen" width="220" /> | <img src="assets/readme/agent-profile.png" alt="Agent profile screen" width="220" /> |
 
 ## What is included
 
@@ -96,7 +108,3 @@ lib/                 Appwrite, PayHero, data, and helpers
 assets/images/       App, tenant, and onboarding images
 scripts/             Local user-seeding script
 ```
-
-## Security note
-
-Never add Appwrite API keys, PayHero credentials, or real customer data to the repository. Keep them in local environment variables or your deployment platform's secret manager.
