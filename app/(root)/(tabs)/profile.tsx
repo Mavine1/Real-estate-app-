@@ -4,7 +4,6 @@ import {
   Image,
   Modal,
   ScrollView,
-  Share,
   Switch,
   Text,
   TextInput,
@@ -20,15 +19,17 @@ import {
   Building2,
   CalendarDays,
   ChevronRight,
+  FileText,
   KeyRound,
   LockKeyhole,
   LogOut,
   MessageCircle,
   Pencil,
   ShieldCheck,
-  Gift,
+  SlidersHorizontal,
   UserRound,
   WalletCards,
+  Gift,
   type LucideIcon,
 } from "lucide-react-native";
 
@@ -36,6 +37,7 @@ import {
   logout,
   updateSecurityPreferences,
   updateUserAvatar,
+  updateUserPreferences,
   updateUserPassword,
 } from "@/lib/appwrite";
 import { useGlobalContext } from "@/lib/global-provider";
@@ -80,13 +82,18 @@ const Profile = () => {
   const [profileSettingsOpen, setProfileSettingsOpen] = useState(false);
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [securityModalVisible, setSecurityModalVisible] = useState(false);
-  const [referralModalVisible, setReferralModalVisible] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
   const [loginAlerts, setLoginAlerts] = useState(true);
   const [savingSecurity, setSavingSecurity] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [payoutAccount, setPayoutAccount] = useState("+254 712 000 456");
+  const [commissionRate, setCommissionRate] = useState("5");
+  const [approvalLimit, setApprovalLimit] = useState("25,000");
+  const [notifications, setNotifications] = useState({ email: true, sms: false, push: true, rent: true, maintenance: true, financial: true });
 
   const handleChangeAvatar = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -201,18 +208,19 @@ const Profile = () => {
     }
   };
 
-  const referralCode = `BARAKA-${(user?.$id ?? "WELCOME").slice(-6).toUpperCase()}`;
-  const referralLink = `https://barakahomes.app/join?ref=${referralCode}`;
-
-  const handleShareReferral = async () => {
+  const handleSettingsSave = async () => {
+    setSavingSettings(true);
     try {
-      await Share.share({
-        message: `Join me on Baraka Homes and find your next place. Use my referral code ${referralCode}: ${referralLink}`,
-      });
+      await updateUserPreferences({ ownerSettings: { payoutAccount, commissionRate, approvalLimit, notifications } });
+      setSettingsVisible(false);
+      Alert.alert("Settings saved", "Your payout, expense, commission, and alert preferences have been updated.");
     } catch (error) {
-      console.warn("[Profile] Referral share cancelled or failed:", error);
+      Alert.alert("Could not save settings", error instanceof Error ? error.message : "Try again shortly.");
+    } finally {
+      setSavingSettings(false);
     }
   };
+
 
   return (
     <SafeAreaView className="h-full bg-transparent">
@@ -273,7 +281,6 @@ const Profile = () => {
               <SettingsItem icon={Pencil} title="Change profile photo" onPress={handleChangeAvatar} />
               <SettingsItem icon={KeyRound} title="Change password" onPress={() => setPasswordModalVisible(true)} />
               <SettingsItem icon={ShieldCheck} title="Security settings" onPress={() => setSecurityModalVisible(true)} />
-              <SettingsItem icon={Gift} title="Referral code & link" onPress={() => setReferralModalVisible(true)} />
               {user?.role === "agent" && <>
                 <SettingsItem icon={Building2} title="Manage houses" onPress={() => router.push({ pathname: "/(root)/(tabs)/management", params: { section: "homes" } })} />
                 <SettingsItem icon={MessageCircle} title="Tenant communication" onPress={() => router.push({ pathname: "/(root)/(tabs)/management", params: { section: "messages" } })} />
@@ -283,9 +290,8 @@ const Profile = () => {
           )}
         </View>
 
-        <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
-          {user?.role === "tenant" && (
-            <>
+        {user?.role === "tenant" && (
+          <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
               <SettingsItem
                 icon={CalendarDays}
                 title="Lease & documents"
@@ -296,11 +302,33 @@ const Profile = () => {
                 title="Payments & receipts"
                 onPress={() => router.push("/(root)/(tabs)/payments")}
               />
-            </>
-          )}
+          </View>
+        )}
+
+        <View className={`flex flex-col ${user?.role === "owner" ? "mt-1" : "border-t mt-5 pt-5 border-primary-200"}`}>
+          {user?.role === "owner" && <SettingsItem
+            icon={FileText}
+            title="Documents"
+            onPress={() => router.push("/(root)/(tabs)/documents")}
+          />}
+          {user?.role === "owner" && <SettingsItem
+            icon={MessageCircle}
+            title="Communication"
+            onPress={() => router.push({ pathname: "/(root)/(tabs)/management", params: { section: "messages" } })}
+          />}
+          {user?.role !== "owner" && <SettingsItem
+            icon={Gift}
+            title="Referral code & link"
+            onPress={() => Alert.alert("Referral code", `Share BARAKA-${(user?.$id ?? "WELCOME").slice(-6).toUpperCase()} with friends.\n\nhttps://barakahomes.app/join`)}
+          />}
+          {user?.role === "owner" && <SettingsItem
+            icon={SlidersHorizontal}
+            title="Settings"
+            onPress={() => setSettingsVisible(true)}
+          />}
         </View>
 
-        <View className="flex flex-col border-t mt-5 pt-5 border-primary-200">
+        <View className={`flex flex-col ${user?.role === "owner" ? "mt-1" : "border-t mt-5 pt-5 border-primary-200"}`}>
           <SettingsItem
             icon={LogOut}
             title="Logout"
@@ -361,6 +389,22 @@ const Profile = () => {
         </View>
       </Modal>
 
+      <Modal transparent visible={settingsVisible} animationType="slide" onRequestClose={() => setSettingsVisible(false)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <ScrollView className="max-h-[88%] rounded-t-[30px] bg-white" contentContainerClassName="p-6 pb-10">
+            <View className="flex-row items-center justify-between"><View><Text className="text-xl font-rubik-bold text-black-300">Settings</Text><Text className="mt-1 text-sm font-rubik text-black-100">Financial controls and notifications.</Text></View><TouchableOpacity onPress={() => setSettingsVisible(false)} className="size-10 items-center justify-center rounded-full bg-primary-100"><Text className="text-xl font-rubik-semibold text-black-200">×</Text></TouchableOpacity></View>
+            <Text className="mt-6 text-sm font-rubik-bold text-black-300">FINANCIAL SETTINGS</Text>
+            <Text className="mt-3 text-xs font-rubik text-black-100">Payout account</Text><TextInput value={payoutAccount} onChangeText={setPayoutAccount} keyboardType="phone-pad" className="mt-2 h-13 rounded-2xl border border-primary-200 px-4 font-rubik text-black-300" />
+            <Text className="mt-4 text-xs font-rubik text-black-100">Agent commission (%)</Text><TextInput value={commissionRate} onChangeText={setCommissionRate} keyboardType="numeric" className="mt-2 h-13 rounded-2xl border border-primary-200 px-4 font-rubik text-black-300" />
+            <Text className="mt-4 text-xs font-rubik text-black-100">Expense approval limit (KSh)</Text><TextInput value={approvalLimit} onChangeText={setApprovalLimit} keyboardType="numeric" className="mt-2 h-13 rounded-2xl border border-primary-200 px-4 font-rubik text-black-300" />
+            <Text className="mt-6 text-sm font-rubik-bold text-black-300">NOTIFICATIONS</Text>
+            {([ ["Email", "email"], ["SMS", "sms"], ["Push notifications", "push"], ["Rent alerts", "rent"], ["Maintenance alerts", "maintenance"], ["Financial alerts", "financial"] ] as const).map(([label, key]) => <View key={key} className="mt-2 flex-row items-center justify-between rounded-2xl bg-primary-100 px-4 py-3"><Text className="font-rubik-medium text-black-300">{label}</Text><Switch value={notifications[key]} onValueChange={(value) => setNotifications((current) => ({ ...current, [key]: value }))} trackColor={{ false: "#CBD5E1", true: "#92B2FF" }} thumbColor={notifications[key] ? "#2F6BFF" : "#FFFFFF"} /></View>)}
+            <TouchableOpacity onPress={handleSettingsSave} disabled={savingSettings} className="mt-6 h-14 items-center justify-center rounded-full bg-primary-300">{savingSettings ? <ActivityIndicator color="#FFFFFF" /> : <Text className="font-rubik-bold text-white">Save settings</Text>}</TouchableOpacity>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Referral and owner-settings panels removed from the Profile menu.
       <Modal transparent visible={referralModalVisible} animationType="slide" onRequestClose={() => setReferralModalVisible(false)}>
         <View className="flex-1 justify-end bg-black/40">
           <View className="rounded-t-[30px] bg-white px-6 pb-9 pt-6">
@@ -376,6 +420,24 @@ const Profile = () => {
           </View>
         </View>
       </Modal>
+
+      <Modal transparent visible={ownerSettingsVisible} animationType="slide" onRequestClose={() => setOwnerSettingsVisible(false)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <ScrollView className="max-h-[88%] rounded-t-[30px] bg-white" contentContainerClassName="p-6 pb-10">
+            <View className="flex-row items-center justify-between"><View><Text className="text-xl font-rubik-bold text-black-300">Owner settings</Text><Text className="mt-1 text-sm font-rubik text-black-100">Control your portfolio and alerts.</Text></View><View className="size-11 items-center justify-center rounded-full bg-primary-100"><SlidersHorizontal size={21} color="#2F6BFF" /></View></View>
+            <Text className="mt-6 text-sm font-rubik-bold text-black-300">ACCOUNT & SECURITY</Text>
+            <View className="mt-3 rounded-[20px] bg-primary-100 p-4"><View className="flex-row items-center justify-between"><View className="flex-1"><Text className="font-rubik-semibold text-black-300">Two-factor authentication</Text><Text className="mt-1 text-xs leading-4 font-rubik text-black-100">Require an extra verification step for sign-ins.</Text></View><Switch value={ownerSettings.twoFactor} onValueChange={(value) => setOwnerSettings((settings) => ({ ...settings, twoFactor: value }))} trackColor={{ false: "#CBD5E1", true: "#92B2FF" }} thumbColor={ownerSettings.twoFactor ? "#2F6BFF" : "#FFFFFF"} /></View></View>
+            <Text className="mt-6 text-sm font-rubik-bold text-black-300">PROPERTY SETTINGS</Text>
+            <View className="mt-3 rounded-[20px] bg-primary-100 p-4"><Text className="font-rubik-semibold text-black-300">Property information · Rent settings</Text><Text className="mt-1 text-xs leading-5 font-rubik text-black-100">Update property details, unit rents, payment terms, utility charges, and tenant-facing settings from your Portfolio.</Text></View>
+            <Text className="mt-6 text-sm font-rubik-bold text-black-300">FINANCIAL SETTINGS</Text>
+            <View className="mt-3 rounded-[20px] bg-primary-100 p-4"><Text className="font-rubik-semibold text-black-300">Payout account · Payment methods</Text><Text className="mt-1 text-xs leading-5 font-rubik text-black-100">Manage payout accounts, agent commissions, expense rules, and payment methods in Payouts & Reports.</Text></View>
+            <Text className="mt-6 text-sm font-rubik-bold text-black-300">NOTIFICATION SETTINGS</Text>
+            {([ ["Email notifications", "email"], ["SMS notifications", "sms"], ["Push notifications", "push"], ["Rent alerts", "rentAlerts"], ["Maintenance alerts", "maintenanceAlerts"], ["Financial alerts", "financialAlerts"] ] as const).map(([label, key]) => <View key={key} className="mt-2 flex-row items-center justify-between rounded-2xl bg-primary-100 px-4 py-3"><Text className="font-rubik-medium text-black-300">{label}</Text><Switch value={ownerSettings[key]} onValueChange={(value) => setOwnerSettings((settings) => ({ ...settings, [key]: value }))} trackColor={{ false: "#CBD5E1", true: "#92B2FF" }} thumbColor={ownerSettings[key] ? "#2F6BFF" : "#FFFFFF"} /></View>)}
+            <TouchableOpacity onPress={saveOwnerSettings} disabled={savingOwnerSettings} className="mt-6 h-14 items-center justify-center rounded-full bg-primary-300">{savingOwnerSettings ? <ActivityIndicator color="#FFFFFF" /> : <Text className="font-rubik-bold text-white">Save owner settings</Text>}</TouchableOpacity>
+          </ScrollView>
+        </View>
+      </Modal>
+      */}
     </SafeAreaView>
   );
 };

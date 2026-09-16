@@ -9,7 +9,8 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react-native";
-import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 
@@ -27,6 +28,7 @@ const Stat = ({ label, value, accent }: { label: string; value: string; accent?:
 
 export default function RoleDashboard() {
   const { user } = useGlobalContext();
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const owner = user?.role === "owner";
   const firstName = user?.name?.trim().split(/\s+/)[0] || (owner ? "Owner" : "Agent");
   const hour = new Date().getHours();
@@ -47,7 +49,7 @@ export default function RoleDashboard() {
               <Text className="mt-0.5 text-lg font-rubik-bold text-black-300">Hi, {firstName}</Text>
             </View>
           </View>
-          <TouchableOpacity onPress={() => Alert.alert(owner ? "Owner notifications" : "Agent notifications", owner ? "7 approvals require your review.\n1 owner payout is processing.\n2 leases expire this month." : "3 tenants have rent reminders due.\n2 maintenance requests are open.\n1 home is currently vacant.")} className="size-11 items-center justify-center rounded-full bg-white"><Bell size={22} color="#17213C" /></TouchableOpacity>
+          <TouchableOpacity onPress={() => owner ? setNotificationsOpen(true) : Alert.alert("Agent notifications", "3 tenants have rent reminders due.\n2 maintenance requests are open.\n1 home is currently vacant.")} className="size-11 items-center justify-center rounded-full bg-white"><Bell size={22} color="#17213C" /></TouchableOpacity>
         </View>
 
         {owner ? (
@@ -110,6 +112,28 @@ export default function RoleDashboard() {
           <Text className="mt-2 text-right text-xs font-rubik-semibold text-[#159B6C]">89.6% occupied</Text>
         </View>
       </ScrollView>
+      <Modal transparent visible={notificationsOpen} animationType="slide" onRequestClose={() => setNotificationsOpen(false)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <ScrollView className="max-h-[84%] rounded-t-[30px] bg-white" contentContainerClassName="p-6 pb-10">
+            <View className="flex-row items-center justify-between"><View><Text className="text-xl font-rubik-bold text-black-300">Notifications</Text><Text className="mt-1 text-sm font-rubik text-black-100">Owner portfolio activity</Text></View><TouchableOpacity onPress={() => setNotificationsOpen(false)} className="size-10 items-center justify-center rounded-full bg-primary-100"><Text className="text-xl font-rubik-semibold text-black-200">×</Text></TouchableOpacity></View>
+            {[
+              ["Rent collected", "Parkview Apartments · KSh 42,000 received", "#159B6C"],
+              ["Rent overdue", "Brian Otieno has an overdue rent balance", "#E66B2E"],
+              ["Major outstanding balance", "KSh 60,000 needs review across your portfolio", "#D94841"],
+              ["New tenant", "Amina Hassan has completed move-in", "#2F6BFF"],
+              ["Tenant leaving", "Move-out notice received for Suite 16", "#7A5AF8"],
+              ["Lease expiring", "2 leases end in the next 30 days", "#E66B2E"],
+              ["Maintenance request", "Water heater issue reported in Unit B-12", "#2F6BFF"],
+              ["Maintenance approval", "A plumbing quote requires approval", "#7A5AF8"],
+              ["Expense approval", "Security invoice of KSh 42,000 is pending", "#E66B2E"],
+              ["Property issue", "Gate motor fault reported at Sunrise Apartments", "#D94841"],
+              ["Agent activity", "Grace Wanjiku recorded a tenant payment", "#2F6BFF"],
+              ["Owner payout", "September payout is ready for processing", "#159B6C"],
+              ["Failed payment", "One M-Pesa rent payment was not completed", "#D94841"],
+            ].map(([title, detail, color], index) => <View key={title} className="mt-3 flex-row rounded-[20px] bg-primary-100 p-4"><View className="mt-1 size-2 rounded-full" style={{ backgroundColor: color }} /><View className="ml-3 flex-1"><Text className="font-rubik-semibold text-black-300">{title}</Text><Text className="mt-1 text-xs leading-5 font-rubik text-black-100">{detail}</Text><Text className="mt-1 text-[10px] font-rubik text-black-100">{index < 2 ? "Today" : "This week"}</Text></View></View>)}
+          </ScrollView>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

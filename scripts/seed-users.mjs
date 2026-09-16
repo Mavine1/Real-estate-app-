@@ -33,6 +33,13 @@ const seedUsers = [
     role: "agent",
   },
   {
+    userId: "seed-caretaker",
+    name: "Demo Caretaker",
+    email: "caretaker@barakahomes.test",
+    password: "Caretaker@123",
+    role: "caretaker",
+  },
+  {
     userId: "seed-owner",
     name: "Demo Owner",
     email: "owner@barakahomes.test",
@@ -98,4 +105,4 @@ for (const user of seedUsers) {
   await seedUser(user);
 }
 
-console.log("Seeded Tenant, Agent, and Owner accounts successfully.");
+console.log("Seeded Tenant, Agent, Caretaker, and Owner accounts successfully.");

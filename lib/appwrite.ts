@@ -5,6 +5,7 @@ import {
   Account,
   ID,
   Databases,
+  TablesDB,
   OAuthProvider,
   Avatars,
   Query,
@@ -27,6 +28,8 @@ export const config = {
   agentsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_AGENTS_COLLECTION_ID,
   propertiesCollectionId:
     process.env.EXPO_PUBLIC_APPWRITE_PROPERTIES_COLLECTION_ID,
+  caretakerTasksTableId:
+    process.env.EXPO_PUBLIC_APPWRITE_CARETAKER_TASKS_TABLE_ID ?? "caretaker_tasks",
   bucketId: process.env.EXPO_PUBLIC_APPWRITE_BUCKET_ID,
   payHeroFunctionId:
     process.env.EXPO_PUBLIC_APPWRITE_PAYHERO_FUNCTION_ID ?? "payhero-payments",
@@ -44,9 +47,10 @@ if (config.projectId) {
 export const avatar = new Avatars(client);
 export const account = new Account(client);
 export const databases = new Databases(client);
+export const tablesDB = new TablesDB(client);
 export const storage = new Storage(client);
 
-export const USER_ROLES = ["tenant", "agent", "owner"] as const;
+export const USER_ROLES = ["tenant", "agent", "caretaker", "owner"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
 export type AppUser = {
@@ -57,7 +61,16 @@ export type AppUser = {
   role: UserRole;
 };
 
-const withTimeout = async <T>(request: Promise<T>, timeoutMs = 12_000) => {
+export type CaretakerTask = {
+  $id: string;
+  title?: string;
+  status?: string;
+  property_name?: string;
+  unit?: string;
+  due_date?: string;
+};
+
+const withTimeout = async <T>(request: Promise<T>, timeoutMs = 25_000) => {
   let timer: ReturnType<typeof setTimeout> | undefined;
 
   try {
@@ -65,7 +78,7 @@ const withTimeout = async <T>(request: Promise<T>, timeoutMs = 12_000) => {
       request,
       new Promise<never>((_, reject) => {
         timer = setTimeout(
-          () => reject(new Error("Appwrite request timed out. Check your connection and try again.")),
+          () => reject(new Error("Unable to reach Appwrite. Check your internet connection and try again.")),
           timeoutMs
         );
       }),
@@ -87,7 +100,8 @@ export const getAuthenticationErrorMessage = (error: unknown) => {
     return "Incorrect email or password.";
   if (code === 429)
     return "Too many sign-in attempts. Please wait a moment and try again.";
-  if (message?.toLowerCase().includes("timed out")) return message;
+  if (message?.toLowerCase().includes("timed out") || message?.toLowerCase().includes("unable to reach appwrite"))
+    return "Unable to reach Baraka Homes securely. Check your internet connection and try again.";
   if (message?.toLowerCase().includes("network"))
     return "Unable to reach Appwrite. Check your internet connection and try again.";
 
@@ -100,7 +114,10 @@ const logAuthenticationFailure = (method: string, error: unknown) => {
     code === 401 ||
     code === 429 ||
     type?.includes("invalid_credentials") ||
-    message?.toLowerCase().includes("cancelled");
+    message?.toLowerCase().includes("cancelled") ||
+    message?.toLowerCase().includes("timed out") ||
+    message?.toLowerCase().includes("unable to reach appwrite") ||
+    message?.toLowerCase().includes("network");
 
   if (expectedRejection) {
     console.warn(`[Auth] ${method}: ${getAuthenticationErrorMessage(error)}`);
@@ -249,6 +266,15 @@ export async function updateSecurityPreferences(loginAlerts: boolean) {
   await withTimeout(
     account.updatePrefs({
       prefs: { ...accountUser.prefs, loginAlerts },
+    })
+  );
+}
+
+export async function updateUserPreferences(update: Record<string, unknown>) {
+  const accountUser = await withTimeout(account.get());
+  await withTimeout(
+    account.updatePrefs({
+      prefs: { ...accountUser.prefs, ...update },
     })
   );
 }
@@ -465,6 +491,31 @@ export async function getProperties({
     return result.documents;
   } catch (error) {
     console.error(error);
+    return [];
+  }
+}
+
+export async function getCaretakerTasks({ caretakerId }: { caretakerId: string }): Promise<CaretakerTask[]> {
+  if (!caretakerId || !config.databaseId || !config.caretakerTasksTableId) return [];
+
+  try {
+    const result = await tablesDB.listRows({
+      databaseId: config.databaseId,
+      tableId: config.caretakerTasksTableId,
+      queries: [
+        Query.equal("caretaker_id", caretakerId),
+        Query.orderDesc("$createdAt"),
+        Query.limit(50),
+      ],
+      ttl: 0,
+    });
+
+    return result.rows.map((row) => ({
+      $id: row.$id,
+      ...(row.data as Record<string, unknown>),
+    })) as CaretakerTask[];
+  } catch (error) {
+    console.warn("[Caretaker] Could not load assigned tasks:", error);
     return [];
   }
 }

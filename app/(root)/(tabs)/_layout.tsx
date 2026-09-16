@@ -42,6 +42,7 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const tenant = user?.role === "tenant";
   const owner = user?.role === "owner";
+  const caretaker = user?.role === "caretaker";
 
   return (
     <Tabs
@@ -94,7 +95,7 @@ export default function TabsLayout() {
         name="management"
         options={{
           href: tenant ? null : undefined,
-          title: owner ? "Portfolio" : "Tenants",
+          title: owner ? "Portfolio" : caretaker ? "Workspace" : "Tenants",
           tabBarIcon: owner ? PortfolioIcon : TenantIcon,
         }}
       />
